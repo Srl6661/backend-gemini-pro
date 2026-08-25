@@ -1,7 +1,6 @@
 from bottle import Bottle, request, response, run, static_file
 import mercadopago
 import os
-import re
 import uuid
 import hmac
 import hashlib
@@ -18,16 +17,8 @@ if not ACCESS_TOKEN:
     )
 sdk = mercadopago.SDK(ACCESS_TOKEN)
 
-# Chave secreta usada só pra gerar o código de pedido (referência que o cliente te manda
-# no WhatsApp). Configure SECRET_KEY como variável de ambiente em produção.
+# Chave secreta usada só pra gerar o código de pedido (referência que o cliente te manda no WhatsApp).
 SECRET_KEY = os.environ.get('SECRET_KEY', 'troque-essa-chave-em-producao')
-
-# Ajuste aqui o valor e a descrição da oferta.
-VALOR_OFERTA = 60.00
-DESCRICAO_OFERTA = "Gemini Pro - 18 meses"
-
-EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
 
 @app.hook('after_request')
 def enable_cors():
@@ -37,8 +28,7 @@ def enable_cors():
 
 
 def gerar_codigo_pedido(payment_id):
-    """Código curto que o cliente te manda no WhatsApp pra você achar o pagamento dele.
-    É assinado com HMAC, então ninguém consegue inventar um código válido na mão."""
+    """Código curto que o cliente te manda no WhatsApp pra você achar o pagamento dele."""
     assinatura = hmac.new(SECRET_KEY.encode(), str(payment_id).encode(), hashlib.sha256).hexdigest()[:8].upper()
     return f"GP-{assinatura}"
 
@@ -62,18 +52,33 @@ def gerar_pix():
     if not client_id:
         return {"error": "client_id obrigatório"}
 
-    # Email de quem está comprando — nunca o seu, senão toda cobrança te notifica sobre si mesma.
-    email_comprador = (dados.get("email") or "").strip()
-    if not EMAIL_REGEX.match(email_comprador):
-        return {"error": "Informe um email válido para gerar o Pix"}
+    # 1. Recebe os dados dinâmicos da nova vitrine do site
+    produto = dados.get("produto", "Serviço de Tecnologia")
+    quantidade = dados.get("quantidade", 1)
+    
+    # Tenta converter o valor total de forma segura
+    try:
+        valor_total = float(dados.get("valor_total", 0))
+    except (ValueError, TypeError):
+        return {"error": "Valor inválido enviado pelo site."}
+
+    # Trava de segurança: impede gerar Pix zerado
+    if valor_total <= 0:
+        return {"error": "O valor da transação deve ser maior que zero."}
+
+    # 2. Descrição dinâmica pro seu extrato do Mercado Pago
+    descricao_dinamica = f"{quantidade}x {produto}"
+
+    # 3. Email fantasma: O MP exige, mas pra encurtar o tempo do cliente, geramos um automaticamente
+    email_fantasma = f"comprador_{client_id[:8]}@tecnologia.com"
 
     payment_data = {
-        "transaction_amount": VALOR_OFERTA,
-        "description": DESCRICAO_OFERTA,
+        "transaction_amount": valor_total,
+        "description": descricao_dinamica,
         "payment_method_id": "pix",
         "external_reference": client_id,
         "payer": {
-            "email": email_comprador
+            "email": email_fantasma
         }
     }
 
@@ -86,7 +91,7 @@ def gerar_pix():
     payment = result.get("response", {})
 
     if "id" not in payment:
-        return {"error": "Erro ao gerar PIX", "detalhes": payment}
+        return {"error": "Erro ao gerar PIX com o Banco.", "detalhes": payment}
 
     transaction_data = payment.get("point_of_interaction", {}).get("transaction_data", {})
 
