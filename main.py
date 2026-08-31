@@ -10,6 +10,7 @@ import requests
 import threading
 import json
 from telethon import TelegramClient
+from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError
 
 app = Bottle()
@@ -117,6 +118,11 @@ def status_pagamento(id):
 CATALOGO_ATUALIZADO = []
 API_ID = 33561861
 API_HASH = '457908461a1dca18edc5ae51418b2dd7'
+TELEGRAM_SESSION = os.environ.get('TELEGRAM_SESSION')
+if not TELEGRAM_SESSION:
+    print("AVISO: variável de ambiente TELEGRAM_SESSION não definida. "
+          "Rode gerar_sessao.py localmente e cadastre o valor no Render. "
+          "O scraping do Telegram não vai funcionar sem isso.")
 
 def calcular_preco(nome, preco_usd, dolar_hoje):
     if "Gemini" in nome:
@@ -150,7 +156,11 @@ async def buscar_dolar_hoje():
 
 
 async def varredura_telegram():
-    client = TelegramClient('sessao_secundaria', API_ID, API_HASH)
+    if not TELEGRAM_SESSION:
+        print("Varredura abortada: TELEGRAM_SESSION não configurada.")
+        return
+
+    client = TelegramClient(StringSession(TELEGRAM_SESSION), API_ID, API_HASH)
     await client.connect()
 
     if not await client.is_user_authorized():
