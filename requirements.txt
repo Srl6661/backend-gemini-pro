@@ -1,4 +1,0 @@
-bottle
-mercadopago
-requests
-telethon
