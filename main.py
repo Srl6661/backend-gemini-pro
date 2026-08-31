@@ -1,4 +1,6 @@
 from bottle import Bottle, request, response, run, static_file
+import sys
+sys.stdout.reconfigure(line_buffering=True)  # evita prints "presos" no buffer nos logs do Render
 import mercadopago
 import os
 import uuid
