@@ -162,6 +162,7 @@ async def varredura_telegram():
 
     client = TelegramClient(StringSession(TELEGRAM_SESSION), API_ID, API_HASH)
     await client.connect()
+    print(f"[varredura] Conectado ao Telegram. Autorizado: {await client.is_user_authorized()}")
 
     if not await client.is_user_authorized():
         print("ERRO CRÍTICO: sessão do Telegram não está autorizada. "
@@ -170,12 +171,16 @@ async def varredura_telegram():
 
     while True:
         try:
+            print("[varredura] Iniciando novo ciclo...")
             dolar_hoje = await buscar_dolar_hoje()
+            print(f"[varredura] Dólar hoje: {dolar_hoje}")
             texto = None
 
             async with client.conversation('@GGSoma_bot', timeout=30) as conv:
+                print("[varredura] Conversa aberta, enviando /products...")
                 await conv.send_message('/products')
                 menu = await conv.get_response()
+                print(f"[varredura] Menu recebido. Tem botões: {bool(menu.buttons)}")
 
                 # Procura o botão "Available"/"Products" no teclado inline
                 botao = None
@@ -192,7 +197,9 @@ async def varredura_telegram():
                 if botao is None:
                     # Bot já mandou o texto puro, sem precisar clicar em nada
                     texto = menu.text
+                    print("[varredura] Nenhum botão relevante, usando texto direto do menu.")
                 else:
+                    print(f"[varredura] Clicando no botão: {botao.text!r}")
                     await botao.click()
 
                     # O bot pode EDITAR a msg do menu OU mandar uma NOVA.
@@ -215,11 +222,14 @@ async def varredura_telegram():
 
                     if concluidas:
                         texto = concluidas.pop().result().text
+                        print(f"[varredura] Texto recebido após clique ({len(texto)} chars).")
                     else:
                         print("Timeout esperando a lista aparecer após o clique.")
 
             if not texto:
                 raise ValueError("Nenhum texto de lista recebido do bot.")
+
+            print(f"[varredura] Texto bruto recebido:\n{texto[:500]}")
 
             # Motor blindado: Nome | $Preço | (Estoque)
             padrao = r"(.*?)\s*\|\s*\$([\d\.]+)\s*\|\s*\((\d+)\)"
@@ -247,6 +257,7 @@ async def varredura_telegram():
             if len(nova_lista) > 0:
                 global CATALOGO_ATUALIZADO
                 CATALOGO_ATUALIZADO = nova_lista
+                print(f"[varredura] Catálogo atualizado com {len(nova_lista)} produtos.")
             else:
                 print("Regex não encontrou itens no texto recebido:", texto[:200])
 
