@@ -4,11 +4,16 @@ import os
 import uuid
 import hmac
 import hashlib
+import asyncio
+import re
+import requests
+import threading
+import json
+from telethon import TelegramClient
 
 app = Bottle()
 
-# TOKEN DE PRODUÇÃO DO MERCADO PAGO — nunca deixe escrito aqui.
-# Configure a variável de ambiente ACCESS_TOKEN no painel do Render (Settings > Environment).
+# --- CONFIGURAÇÕES MERCADO PAGO ---
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 if not ACCESS_TOKEN:
     raise RuntimeError(
@@ -16,8 +21,6 @@ if not ACCESS_TOKEN:
         "Configure-a no Render com o token de produção do Mercado Pago."
     )
 sdk = mercadopago.SDK(ACCESS_TOKEN)
-
-# Chave secreta usada só pra gerar o código de pedido (referência que o cliente te manda no WhatsApp).
 SECRET_KEY = os.environ.get('SECRET_KEY', 'troque-essa-chave-em-producao')
 
 @app.hook('after_request')
@@ -28,7 +31,6 @@ def enable_cors():
 
 
 def gerar_codigo_pedido(payment_id):
-    """Código curto que o cliente te manda no WhatsApp pra você achar o pagamento dele."""
     assinatura = hmac.new(SECRET_KEY.encode(), str(payment_id).encode(), hashlib.sha256).hexdigest()[:8].upper()
     return f"GP-{assinatura}"
 
@@ -36,7 +38,7 @@ def gerar_codigo_pedido(payment_id):
 def validar_codigo_pedido(payment_id, codigo):
     return hmac.compare_digest(gerar_codigo_pedido(payment_id), codigo or "")
 
-
+# --- ROTAS DO MERCADO PAGO ---
 @app.route('/')
 def index():
     return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
@@ -52,24 +54,18 @@ def gerar_pix():
     if not client_id:
         return {"error": "client_id obrigatório"}
 
-    # 1. Recebe os dados dinâmicos da nova vitrine do site
     produto = dados.get("produto", "Serviço de Tecnologia")
     quantidade = dados.get("quantidade", 1)
     
-    # Tenta converter o valor total de forma segura
     try:
         valor_total = float(dados.get("valor_total", 0))
     except (ValueError, TypeError):
         return {"error": "Valor inválido enviado pelo site."}
 
-    # Trava de segurança: impede gerar Pix zerado
     if valor_total <= 0:
         return {"error": "O valor da transação deve ser maior que zero."}
 
-    # 2. Descrição dinâmica pro seu extrato do Mercado Pago
     descricao_dinamica = f"{quantidade}x {produto}"
-
-    # 3. Email fantasma: O MP exige, mas pra encurtar o tempo do cliente, geramos um automaticamente
     email_fantasma = f"comprador_{client_id[:8]}@tecnologia.com"
 
     payment_data = {
@@ -116,6 +112,80 @@ def status_pagamento(id):
     return resposta
 
 
+# --- INÍCIO DA AUTOMAÇÃO DO TELEGRAM ---
+CATALOGO_ATUALIZADO = []
+API_ID = 33561861
+API_HASH = '457908461a1dca18edc5ae51418b2dd7'
+
+def calcular_preco(nome, preco_usd, dolar_hoje):
+    if "Gemini" in nome:
+        return 60.00
+    
+    custo_reais = float(preco_usd) * dolar_hoje
+    if float(preco_usd) <= 5.00:
+        return custo_reais * 10.00
+    else:
+        return custo_reais * 7.00
+
+async def varredura_telegram():
+    client = TelegramClient('sessao_secundaria', API_ID, API_HASH)
+    await client.connect()
+
+    while True:
+        try:
+            req = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL")
+            dolar_hoje = float(req.json()['USDBRL']['bid'])
+
+            await client.send_message('@GGSoma_bot', '/products')
+            await asyncio.sleep(5) 
+            
+            mensagens = await client.get_messages('@GGSoma_bot', limit=1)
+            texto = mensagens[0].text
+            
+            padrao = r"(?:🤖|✨|🎓)\s*(.*?)(?:\((\d+)\))?\n\s*💰\s*\$([\d\.]+)"
+            itens = re.findall(padrao, texto)
+            
+            nova_lista = []
+            for nome, estoque, preco_usd in itens:
+                tem_estoque = False if estoque == "0" else True
+                preco_final = calcular_preco(nome, preco_usd, dolar_hoje)
+                
+                nova_lista.append({
+                    "id": nome.lower().replace(" ", "_")[:15],
+                    "nome": nome.strip(),
+                    "precoBase": preco_final,
+                    "precoDisplay": f"R$ {preco_final:,.2f}".replace(".", ","),
+                    "estoque": tem_estoque
+                })
+            
+            global CATALOGO_ATUALIZADO
+            CATALOGO_ATUALIZADO = nova_lista
+
+        except Exception as e:
+            print("Erro na varredura:", e)
+        
+        await asyncio.sleep(300)
+
+def iniciar_robo_background():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(varredura_telegram())
+
+thread = threading.Thread(target=iniciar_robo_background, daemon=True)
+thread.start()
+
+# Rota para o seu site puxar o catálogo gerado pelo robô
+@app.route('/api/catalogo', method=['GET', 'OPTIONS'])
+def entregar_site():
+    if request.method == 'OPTIONS':
+        return {}
+    
+    response.content_type = 'application/json'
+    return json.dumps(CATALOGO_ATUALIZADO)
+# --- FIM DA AUTOMAÇÃO DO TELEGRAM ---
+
+
+# --- INICIALIZAÇÃO DO SERVIDOR (DEVE FICAR SEMPRE NO FINAL) ---
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     run(app, host='0.0.0.0', port=port)
