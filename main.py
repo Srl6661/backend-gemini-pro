@@ -189,3 +189,54 @@ def entregar_site():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     run(app, host='0.0.0.0', port=port)
+async def varredura_telegram():
+    client = TelegramClient('sessao_secundaria', API_ID, API_HASH)
+    await client.connect()
+
+    while True:
+        try:
+            req = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL")
+            dolar_hoje = float(req.json()['USDBRL']['bid'])
+
+            await client.send_message('@GGSoma_bot', '/products')
+            await asyncio.sleep(5) 
+            
+            mensagens = await client.get_messages('@GGSoma_bot', limit=1)
+            texto = mensagens[0].text
+            
+            # --- NOVO MOTOR BLINDADO ANTIFALHAS ---
+            # Removemos todos os emojis (qualquer coisa que não seja letra, número, ponto, vírgula, parênteses ou $)
+            texto_limpo = re.sub(r'[^\w\s\.\,\(\)\$\-]', '', texto)
+            
+            # O Regex agora ignora emojis e símbolos:
+            # 1. Pega textos que começam com letra ou número (Nome)
+            # 2. Pega um número entre parênteses opcional (Estoque)
+            # 3. Pula pra linha de baixo e acha o primeiro número com casa decimal (Preço)
+            padrao = r"([a-zA-Z0-9].*?)(?:\s*\((\d+)\))?\s*\n.*?([\d]+[\.,][\d]+)"
+            itens = re.findall(padrao, texto_limpo)
+            
+            nova_lista = []
+            for nome, estoque, preco_str in itens:
+                tem_estoque = False if estoque == "0" else True
+                
+                # Força a troca de vírgula por ponto para não quebrar a matemática
+                preco_usd = float(preco_str.replace(',', '.'))
+                preco_final = calcular_preco(nome, preco_usd, dolar_hoje)
+                
+                nova_lista.append({
+                    "id": nome.lower().replace(" ", "_")[:15],
+                    "nome": nome.strip(),
+                    "precoBase": preco_final,
+                    "precoDisplay": f"R$ {preco_final:,.2f}".replace(".", ","),
+                    "estoque": tem_estoque
+                })
+            
+            # Trava de segurança: só atualiza o site se conseguiu extrair produtos
+            if len(nova_lista) > 0:
+                global CATALOGO_ATUALIZADO
+                CATALOGO_ATUALIZADO = nova_lista
+
+        except Exception as e:
+            print("Erro na varredura:", e)
+        
+        await asyncio.sleep(300)
