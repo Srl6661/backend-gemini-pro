@@ -142,20 +142,23 @@ async def varredura_telegram():
             mensagens = await client.get_messages('@GGSoma_bot', limit=1)
             texto = mensagens[0].text
             
-            # Motor blindado contra alteração de emojis e símbolos pelo fornecedor
-            texto_limpo = re.sub(r'[^\w\s\.\,\(\)\$\-]', '', texto)
-            padrao = r"([a-zA-Z0-9].*?)(?:\s*\((\d+)\))?\s*\n.*?([\d]+[\.,][\d]+)"
-            itens = re.findall(padrao, texto_limpo)
+            # Novo motor blindado adaptado para o formato: Nome | $Preço | (Estoque)
+            padrao = r"(.*?)\s*\|\s*\$([\d\.]+)\s*\|\s*\((\d+)\)"
+            itens = re.findall(padrao, texto)
             
             nova_lista = []
-            for nome, estoque, preco_str in itens:
+            for nome, preco_usd_str, estoque in itens:
+                nome_limpo = nome.strip()
+                if not nome_limpo or "bot shop" in nome_limpo.lower():
+                    continue
+                
                 tem_estoque = False if estoque == "0" else True
-                preco_usd = float(preco_str.replace(',', '.'))
-                preco_final = calcular_preco(nome, preco_usd, dolar_hoje)
+                preco_usd = float(preco_usd_str)
+                preco_final = calcular_preco(nome_limpo, preco_usd, dolar_hoje)
                 
                 nova_lista.append({
-                    "id": nome.lower().replace(" ", "_")[:15],
-                    "nome": nome.strip(),
+                    "id": nome_limpo.lower().replace(" ", "_")[:15],
+                    "nome": nome_limpo,
                     "precoBase": preco_final,
                     "precoDisplay": f"R$ {preco_final:,.2f}".replace(".", ","),
                     "estoque": tem_estoque
@@ -194,4 +197,3 @@ def entregar_site():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     run(app, host='0.0.0.0', port=port)
-
