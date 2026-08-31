@@ -45,7 +45,13 @@ def validar_codigo_pedido(payment_id, codigo):
 # --- ROTAS DO MERCADO PAGO ---
 @app.route('/')
 def index():
-    return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
+    # O frontend (index.html) é servido pelo Netlify, não daqui.
+    # Esta rota existe só para o health check do Render sempre responder 200
+    # (antes, tentava servir um index.html que não existe neste repositório,
+    # o que causava 404 -> Render considerava o serviço não saudável -> reiniciava
+    # o processo continuamente -> matava a varredura do Telegram no meio do ciclo).
+    response.content_type = 'application/json'
+    return json.dumps({"status": "ok", "service": "backend-gemini-pro"})
 
 
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
