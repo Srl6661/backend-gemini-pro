@@ -188,10 +188,37 @@ async def varredura_telegram():
             print(f"[varredura] Dólar hoje: {dolar_hoje}")
             texto = None
 
+            # Guarda a última mensagem do bot ANTES de mandar o comando: se
+            # o bot responder EDITANDO uma mensagem antiga (em vez de mandar
+            # uma nova), é assim que detectamos essa edição também.
+            anteriores = await client.get_messages('@GGSoma_bot', limit=1)
+            ultima_msg_id = anteriores[0].id if anteriores else None
+            print(f"[varredura] Última mensagem anterior do bot: id={ultima_msg_id}")
+
             async with client.conversation('@GGSoma_bot', timeout=60) as conv:
                 print("[varredura] Conversa aberta, enviando /products...")
                 await conv.send_message('/products')
-                menu = await conv.get_response()
+
+                tarefas_iniciais = [asyncio.create_task(conv.get_response())]
+                if ultima_msg_id:
+                    tarefas_iniciais.append(asyncio.create_task(conv.wait_edit(ultima_msg_id)))
+
+                concluidas_ini, pendentes_ini = await asyncio.wait(
+                    tarefas_iniciais,
+                    timeout=60,
+                    return_when=asyncio.FIRST_COMPLETED
+                )
+                for pendente in pendentes_ini:
+                    pendente.cancel()
+                    try:
+                        await pendente
+                    except (asyncio.CancelledError, Exception):
+                        pass
+
+                if not concluidas_ini:
+                    raise TimeoutError("Nenhuma resposta (nova nem edição) ao /products em 60s.")
+
+                menu = concluidas_ini.pop().result()
                 print(f"[varredura] Menu recebido. Tem botões: {bool(menu.buttons)}")
 
                 # Procura o botão "Available"/"Products" no teclado inline
