@@ -13,7 +13,7 @@ import threading
 import json
 from telethon import TelegramClient
 from telethon.sessions import StringSession
-from telethon.errors import SessionPasswordNeededError
+from telethon.errors import SessionPasswordNeededError, FloodWaitError
 
 app = Bottle()
 
@@ -168,7 +168,11 @@ async def varredura_telegram():
         print("Varredura abortada: TELEGRAM_SESSION não configurada.")
         return
 
-    client = TelegramClient(StringSession(TELEGRAM_SESSION), API_ID, API_HASH)
+    client = TelegramClient(
+        StringSession(TELEGRAM_SESSION), API_ID, API_HASH,
+        flood_sleep_threshold=0  # não dormir silenciosamente em FloodWait; deixa estourar
+                                  # como exceção pra aparecer nos logs quanto tempo falta esperar
+    )
     await client.connect()
     print(f"[varredura] Conectado ao Telegram. Autorizado: {await client.is_user_authorized()}")
 
@@ -269,6 +273,10 @@ async def varredura_telegram():
             else:
                 print("Regex não encontrou itens no texto recebido:", texto[:200])
 
+        except FloodWaitError as e:
+            print(f"[varredura] Telegram pediu espera de {e.seconds}s (flood wait) antes de mandar mensagem de novo.")
+            await asyncio.sleep(min(e.seconds + 5, 280))
+            continue
         except Exception as e:
             print(f"Erro na varredura: {type(e).__name__}: {e}")
 
