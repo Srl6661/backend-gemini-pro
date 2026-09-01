@@ -188,12 +188,13 @@ async def varredura_telegram():
             print(f"[varredura] Dólar hoje: {dolar_hoje}")
             texto = None
 
-            # Guarda a última mensagem do bot ANTES de mandar o comando: se
-            # o bot responder EDITANDO uma mensagem antiga (em vez de mandar
-            # uma nova), é assim que detectamos essa edição também.
-            anteriores = await client.get_messages('@GGSoma_bot', limit=1)
-            ultima_msg_id = anteriores[0].id if anteriores else None
-            print(f"[varredura] Última mensagem anterior do bot: id={ultima_msg_id}")
+            # Guarda a última mensagem DO BOT (não a nossa) ANTES de mandar o
+            # comando: se o bot responder EDITANDO uma mensagem antiga (em vez
+            # de mandar uma nova), é assim que detectamos essa edição também.
+            anteriores = await client.get_messages('@GGSoma_bot', limit=20)
+            msgs_do_bot = [m for m in anteriores if not m.out]
+            ultima_msg_id = msgs_do_bot[0].id if msgs_do_bot else None
+            print(f"[varredura] Última mensagem DO BOT (não nossa): id={ultima_msg_id}")
 
             async with client.conversation('@GGSoma_bot', timeout=60) as conv:
                 print("[varredura] Conversa aberta, enviando /products...")
@@ -306,6 +307,16 @@ async def varredura_telegram():
             continue
         except Exception as e:
             print(f"Erro na varredura: {type(e).__name__}: {e}")
+            try:
+                recentes = await client.get_messages('@GGSoma_bot', limit=8)
+                print("[debug] Últimas mensagens no chat com o bot (mais nova primeiro):")
+                for m in recentes:
+                    quem = "NÓS" if m.out else "BOT"
+                    trecho = (m.text or "(sem texto)")[:80].replace("\n", " | ")
+                    print(f"[debug]   id={m.id} de={quem} editada={bool(m.edit_date)} "
+                          f"botoes={bool(m.buttons)} texto={trecho!r}")
+            except Exception as e2:
+                print(f"[debug] Falha ao buscar mensagens recentes: {type(e2).__name__}: {e2}")
 
         await asyncio.sleep(300)
 
