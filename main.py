@@ -201,7 +201,7 @@ async def varredura_telegram():
 
                 tarefas_iniciais = [asyncio.create_task(conv.get_response())]
                 if ultima_msg_id:
-                    tarefas_iniciais.append(asyncio.create_task(conv.wait_edit(ultima_msg_id)))
+                    tarefas_iniciais.append(asyncio.create_task(conv.get_edit(ultima_msg_id)))
 
                 concluidas_ini, pendentes_ini = await asyncio.wait(
                     tarefas_iniciais,
@@ -243,7 +243,7 @@ async def varredura_telegram():
 
                     # O bot pode EDITAR a msg do menu OU mandar uma NOVA.
                     # Espera os dois em paralelo e usa o que chegar primeiro.
-                    tarefa_edicao = asyncio.create_task(conv.wait_edit(menu.id))
+                    tarefa_edicao = asyncio.create_task(conv.get_edit(menu.id))
                     tarefa_nova = asyncio.create_task(conv.get_response())
 
                     concluidas, pendentes = await asyncio.wait(
