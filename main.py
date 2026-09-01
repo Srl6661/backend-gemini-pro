@@ -184,7 +184,7 @@ async def varredura_telegram():
             print(f"[varredura] Dólar hoje: {dolar_hoje}")
             texto = None
 
-            async with client.conversation('@GGSoma_bot', timeout=30) as conv:
+            async with client.conversation('@GGSoma_bot', timeout=60) as conv:
                 print("[varredura] Conversa aberta, enviando /products...")
                 await conv.send_message('/products')
                 menu = await conv.get_response()
@@ -270,7 +270,7 @@ async def varredura_telegram():
                 print("Regex não encontrou itens no texto recebido:", texto[:200])
 
         except Exception as e:
-            print("Erro na varredura:", e)
+            print(f"Erro na varredura: {type(e).__name__}: {e}")
 
         await asyncio.sleep(300)
 
