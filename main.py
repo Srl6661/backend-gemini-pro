@@ -51,15 +51,19 @@ def get_catalogo():
         
         for p in produtos_fornecedor:
             if p.get("stock", {}).get("inStock", False):
-                # Pega o preço em dólar da fornecedora
+                # 1. Pega o preço de custo real do produto
                 custo_usd = float(p.get("yourPrice", 0))
                 
-                # Multiplica pela sua margem (ex: 1.60 -> 85.00)
-                preco_calculado = round(custo_usd * 53.125, 2)
+                # 2. Fórmula de Lucro: (Dólar a R$6) + (Lucro Fixo de R$ 75,40)
+                preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
+                
+                # 3. Puxa o Emoji/Logo oficial da plataforma parceira
+                emoji = p.get("emoji", {}).get("normal", "📦")
+                nome_com_emoji = f"{emoji} {p['name']}"
                 
                 catalogo_tratado.append({
                     "id": p["slug"],
-                    "nome": p["name"],
+                    "nome": nome_com_emoji,
                     "precoBase": preco_calculado,
                     "dominio": p["provider"]["key"] + ".com",
                     "estoque": True,
