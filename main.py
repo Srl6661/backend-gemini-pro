@@ -5,12 +5,13 @@ import uuid
 import hmac
 import hashlib
 import requests
+import json # <-- Biblioteca adicionada
 
 app = Bottle()
 
 # Chaves de Ambiente (Configure no Render)
-ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN') # Do Mercado Pago
-PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') # Chave sk_live_... tirada do Bot
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
+PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-secreta-padrao-123')
 PARTNER_API_URL = "https://ggsoma.store/api/partner/v1"
 
@@ -35,20 +36,21 @@ def index():
 
 @app.route('/api/catalogo', method=['GET', 'OPTIONS'])
 def get_catalogo():
+    response.content_type = 'application/json' # <-- Força o formato aceito pelo Netlify
+    
     if request.method == 'OPTIONS':
-        return {}
+        return json.dumps({})
     
     headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
     try:
         resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
         if resp.status_code != 200:
-            return []
+            return json.dumps([])
             
         produtos_fornecedor = resp.json().get("data", [])
         catalogo_tratado = []
         
         for p in produtos_fornecedor:
-            # Só lista se tiver estoque e custará fixo R$ 85,00
             if p.get("stock", {}).get("inStock", False):
                 catalogo_tratado.append({
                     "id": p["slug"],
@@ -59,10 +61,10 @@ def get_catalogo():
                     "estoque": True,
                     "descricao": p.get("description", "")
                 })
-        return catalogo_tratado
+        return json.dumps(catalogo_tratado) # <-- Converte a lista em texto JSON seguro
     except Exception as e:
         print(f"Erro ao buscar catálogo: {e}")
-        return []
+        return json.dumps([])
 
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
@@ -72,7 +74,7 @@ def gerar_pix():
     dados = request.json or {}
     client_id = dados.get("client_id", "")
     produto_nome = dados.get("produto", "Serviço de Tecnologia")
-    produto_id = dados.get("produto_id", "") # Slug do produto recebido do front
+    produto_id = dados.get("produto_id", "") 
     quantidade = dados.get("quantidade", 1)
     
     try:
@@ -134,13 +136,11 @@ def status_pagamento(id):
         produto_id = payment.get("metadata", {}).get("produto_id")
         quantidade = payment.get("metadata", {}).get("quantidade", 1)
         
-        # Se for um produto da API (tem produto_id), efetua a compra
         if produto_id and not produto_id.startswith("inst_"):
             headers = {
                 "Authorization": f"Bearer {PARTNER_API_KEY}",
                 "Content-Type": "application/json"
             }
-            # externalOrderId com o ID do Mercado Pago previne cobrança dupla
             payload_compra = {
                 "productSlug": produto_id,
                 "quantity": int(quantidade),
