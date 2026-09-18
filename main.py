@@ -6,6 +6,7 @@ import hmac
 import hashlib
 import requests
 import json
+import re  # <--- Adicionado para ler os meses dinamicamente
 
 app = Bottle()
 
@@ -60,47 +61,55 @@ def obter_dominio_logo(nome_produto):
     if 'google' in nome or 'gemini' in nome: return 'google.com'
     return 'ggsoma.store'
 
-# Dicionário que traduz o nome e cria um resumo matador de vendas em PT-BR
+# Dicionário dinâmico que traduz "m" ou "months" e injeta no título
 def traduzir_e_resumir(nome_original):
-    nome = str(nome_original).lower().replace("none", "").strip()
+    # Limpa a sujeira do None e converte para minúsculas
+    nome_base = str(nome_original).replace("None", "").strip()
     
-    if 'chatgpt' in nome: 
-        return "ChatGPT Plus", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
-    if 'gemini' in nome or 'google' in nome: 
-        return "Google Gemini Advanced", "A IA mais poderosa do Google. Resolve problemas complexos, programa e cria conteúdos com altíssima precisão."
-    if 'framer' in nome: 
-        return "Framer Pro", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
-    if 'canva' in nome: 
-        return "Canva Pro", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
-    if 'gamma' in nome: 
-        return "Gamma Pro", "Gere apresentações, documentos e sites inteiros em segundos utilizando o poder da Inteligência Artificial."
-    if 'elevenlabs' in nome: 
-        return "ElevenLabs Creator", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
-    if 'runway' in nome: 
-        return "Runway Pro", "Geração e edição de vídeos impressionantes a partir de textos e imagens utilizando IA cinematográfica."
-    if 'telegram' in nome: 
-        return "Telegram Premium", "Destaque seu perfil, faça downloads mais rápidos, transcrição de áudios e ganhe limites dobrados."
-    if 'linkedin' in nome: 
-        return "LinkedIn Premium", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
-    if 'duolingo' in nome: 
-        return "Duolingo Super", "Aprenda novos idiomas sem anúncios, com vidas ilimitadas e lições offline no seu ritmo."
-    if 'nord' in nome or 'vpn' in nome: 
-        return "NordVPN Premium", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
-    if 'replit' in nome: 
-        return "Replit Core", "Ambiente de desenvolvimento na nuvem com IA integrada para você programar direto do navegador."
-    if 'supabase' in nome: 
-        return "Supabase Pro", "Banco de dados e autenticação escalável para desenvolvedores. A melhor alternativa ao Firebase."
-    if 'n8n' in nome: 
-        return "n8n Starter", "Automatize tarefas repetitivas e integre centenas de aplicativos de forma simples e visual."
-    if 'lovable' in nome: 
-        return "Lovable Pro", "Criação de aplicativos e sistemas completos impulsionados por inteligência artificial."
-    if 'bolt' in nome: 
-        return "Bolt.new Pro", "Desenvolvimento web full-stack direto no navegador com assistência avançada de IA."
-    if 'quillbot' in nome: 
-        return "QuillBot Premium", "Reescreva textos, corrija a gramática e melhore sua fluência em inglês com um clique."
+    # TRADUTOR AUTOMÁTICO DE TEMPO: Transforma "18 Months" ou "12m" em "18 meses" e "12 meses"
+    nome_base = re.sub(r'(\d+)\s*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'(\d+)\s*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     
-    # Se for uma ferramenta desconhecida, ele limpa o nome e dá uma descrição padrão focada em conversão
-    return nome_original.replace("None", "").strip(), "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
+    # Extrai exatamente a quantidade de meses para colocar no título final (ex: " (18 meses)")
+    match_tempo = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
+    sufixo_tempo = f" ({match_tempo.group(1)} meses)" if match_tempo else ""
+    
+    nome_lower = nome_base.lower()
+    
+    # --- O SEU CARRO CHEFE ---
+    if 'gemini' in nome_lower or 'google' in nome_lower: 
+        return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite."
+    
+    # --- DEMAIS PRODUTOS ---
+    if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
+    if 'framer' in nome_lower: return f"Framer Pro{sufixo_tempo}", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
+    if 'canva' in nome_lower: return f"Canva Pro{sufixo_tempo}", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
+    if 'gamma' in nome_lower: return f"Gamma Pro{sufixo_tempo}", "Gere apresentações, documentos e sites inteiros em segundos utilizando o poder da Inteligência Artificial."
+    if 'elevenlabs' in nome_lower: return f"ElevenLabs Creator{sufixo_tempo}", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
+    if 'runway' in nome_lower: return f"Runway Pro{sufixo_tempo}", "Geração e edição de vídeos impressionantes a partir de textos e imagens utilizando IA cinematográfica."
+    if 'telegram' in nome_lower: return f"Telegram Premium{sufixo_tempo}", "Destaque seu perfil, faça downloads mais rápidos, transcrição de áudios e ganhe limites dobrados."
+    if 'linkedin' in nome_lower or 'career' in nome_lower: return f"LinkedIn Premium{sufixo_tempo}", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
+    if 'duolingo' in nome_lower: return f"Duolingo Super{sufixo_tempo}", "Aprenda novos idiomas sem anúncios, com vidas ilimitadas e lições offline no seu ritmo."
+    if 'nord' in nome_lower or 'vpn' in nome_lower: return f"NordVPN Premium{sufixo_tempo}", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
+    if 'replit' in nome_lower: return f"Replit Core{sufixo_tempo}", "Ambiente de desenvolvimento na nuvem com IA integrada para você programar direto do navegador."
+    if 'supabase' in nome_lower: return f"Supabase Pro{sufixo_tempo}", "Banco de dados e autenticação escalável para desenvolvedores. A melhor alternativa ao Firebase."
+    if 'n8n' in nome_lower: return f"n8n Starter{sufixo_tempo}", "Automatize tarefas repetitivas e integre centenas de aplicativos de forma simples e visual."
+    if 'lovable' in nome_lower: return f"Lovable Pro{sufixo_tempo}", "Criação de aplicativos e sistemas completos impulsionados por inteligência artificial."
+    if 'bolt' in nome_lower: return f"Bolt.new Pro{sufixo_tempo}", "Desenvolvimento web full-stack direto no navegador com assistência avançada de IA."
+    if 'quillbot' in nome_lower: return f"QuillBot Premium{sufixo_tempo}", "Reescreva textos, corrija a gramática e melhore sua fluência em inglês com um clique."
+    if 'magic patterns' in nome_lower: return f"Magic Patterns{sufixo_tempo}", "Gere componentes de UI e interfaces completas usando Inteligência Artificial."
+    if 'jam team' in nome_lower or 'jam' in nome_lower: return f"Jam Team{sufixo_tempo}", "Reporte bugs em segundos com gravação de tela e logs automáticos do navegador."
+    if 'linear' in nome_lower: return f"Linear Business{sufixo_tempo}", "A ferramenta de gerenciamento de projetos e issues mais rápida do mercado."
+    if 'gumloop' in nome_lower: return f"Gumloop Pro{sufixo_tempo}", "Automatize workflows complexos sem código de forma visual."
+    if 'railway' in nome_lower: return f"Railway Hobby{sufixo_tempo}", "Implante e hospede seus aplicativos na nuvem de forma instantânea e sem complicações."
+    if 'manus' in nome_lower: return f"Manus Pro{sufixo_tempo}", "Agente de IA revolucionário que controla seu navegador e completa tarefas complexas autonomamente."
+    if 'posthog' in nome_lower: return f"PostHog Scale{sufixo_tempo}", "Plataforma completa de análise de dados, heatmaps e testes A/B para o seu produto."
+    if 'mobbin' in nome_lower: return f"Mobbin 10x Seat{sufixo_tempo}", "A maior biblioteca de referências de design UI/UX do mundo para aplicativos móveis e web."
+    if 'chatprd' in nome_lower: return f"ChatPRD Pro{sufixo_tempo}", "O copiloto de IA definitivo para Product Managers escreverem requisitos e estratégias."
+    if 'proton' in nome_lower: return f"Proton Unlimited{sufixo_tempo}", "E-mail criptografado, calendário, drive e VPN em um ecossistema com privacidade máxima."
+
+    # Se a ferramenta for desconhecida, ele imprime o nome com o tempo detectado
+    return nome_base, "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
 
 @app.route('/')
 def index():
@@ -127,9 +136,8 @@ def get_catalogo():
                 custo_usd = float(p.get("yourPrice", 0))
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 
-                # Traduz o nome e puxa o resumo em PT-BR
+                # O tradutor agora lê o tempo real ("18 meses", "3 meses") e insere no nome
                 nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
-                
                 dominio_logo = obter_dominio_logo(nome_ptbr)
                 
                 catalogo_tratado.append({
