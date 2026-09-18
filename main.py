@@ -29,6 +29,38 @@ def gerar_codigo_pedido(payment_id):
     assinatura = hmac.new(SECRET_KEY.encode(), str(payment_id).encode(), hashlib.sha256).hexdigest()[:8].upper()
     return f"GP-{assinatura}"
 
+# Dicionário invisível: Puxa o link do logo original, mas não exibe o texto no site
+def obter_dominio_logo(nome_produto):
+    nome = nome_produto.lower()
+    if 'chatgpt' in nome or 'openai' in nome: return 'openai.com'
+    if 'framer' in nome: return 'framer.com'
+    if 'lovable' in nome: return 'lovable.dev'
+    if 'magic patterns' in nome: return 'magicpatterns.com'
+    if 'gamma' in nome: return 'gamma.app'
+    if 'n8n' in nome: return 'n8n.io'
+    if 'jam' in nome: return 'jam.dev'
+    if 'linear' in nome: return 'linear.app'
+    if 'gumloop' in nome: return 'gumloop.com'
+    if 'elevenlabs' in nome: return 'elevenlabs.io'
+    if 'supabase' in nome: return 'supabase.com'
+    if 'replit' in nome: return 'replit.com'
+    if 'granola' in nome: return 'granola.so'
+    if 'railway' in nome: return 'railway.app'
+    if 'posthog' in nome: return 'posthog.com'
+    if 'mobbin' in nome: return 'mobbin.com'
+    if 'runway' in nome: return 'runwayml.com'
+    if 'chatprd' in nome: return 'chatprd.ai'
+    if 'proton' in nome: return 'proton.me'
+    if 'nord' in nome or 'vpn' in nome: return 'nordvpn.com'
+    if 'quillbot' in nome: return 'quillbot.com'
+    if 'linkedin' in nome or 'career' in nome: return 'linkedin.com'
+    if 'telegram' in nome: return 'telegram.org'
+    if 'duolingo' in nome: return 'duolingo.com'
+    if 'bolt' in nome: return 'bolt.new'
+    if 'canva' in nome: return 'canva.com'
+    if 'google' in nome or 'gemini' in nome: return 'google.com'
+    return 'ggsoma.store'
+
 @app.route('/')
 def index():
     return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
@@ -54,18 +86,15 @@ def get_catalogo():
                 custo_usd = float(p.get("yourPrice", 0))
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 
-                # Mapeamento inteligente para achar o logo perfeito da empresa
-                provider_key = p.get("provider", {}).get("key", "").lower()
-                dominio = provider_key + ".com"
-                if provider_key == "telegram": dominio = "telegram.org"
-                elif provider_key == "chatgpt": dominio = "openai.com"
-                elif provider_key == "google": dominio = "google.com"
+                # Limpeza do nome: tira qualquer "None" que vem da loja parceira
+                nome_limpo = str(p.get("name", "")).replace("None", "").strip()
+                dominio_logo = obter_dominio_logo(nome_limpo)
                 
                 catalogo_tratado.append({
                     "id": p["slug"],
-                    "nome": p["name"], # Aqui foi removido a palavra "None"
+                    "nome": nome_limpo,
                     "precoBase": preco_calculado,
-                    "dominio": dominio,
+                    "logoDomain": dominio_logo,
                     "estoque": True,
                     "descricao": p.get("description", "")
                 })
