@@ -61,41 +61,25 @@ def obter_dominio_logo(nome_produto):
     if 'google' in nome or 'gemini' in nome: return 'google.com'
     return 'ggsoma.store'
 
-# Dicionário dinâmico com a nova regra de "30 dias"
 def traduzir_e_resumir(nome_original):
-    # Limpa a sujeira do None e converte para minúsculas
     nome_base = str(nome_original).replace("None", "").strip()
     
-    # TRADUTOR AUTOMÁTICO DE TEMPO
-    # 1. Trata especificamente 1 mês para "30 dias"
     nome_base = re.sub(r'\b1\s*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b1\s*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
-    
-    # 2. Trata os demais para "meses"
     nome_base = re.sub(r'(\d+)\s*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\d+)\s*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     
-    # 3. Extrai para o sufixo bonitão
     match_dias = re.search(r'(30\s*dias)', nome_base, re.IGNORECASE)
     match_meses = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
     
     sufixo_tempo = ""
-    if match_dias:
-        sufixo_tempo = " (30 dias)"
-    elif match_meses:
-        sufixo_tempo = f" ({match_meses.group(1)} meses)"
+    if match_dias: sufixo_tempo = " (30 dias)"
+    elif match_meses: sufixo_tempo = f" ({match_meses.group(1)} meses)"
     
     nome_lower = nome_base.lower()
     
-    # --- O SEU CARRO CHEFE (Gemini Pro 18 Months de $1.60) ---
-    if 'gemini' in nome_lower: 
-        return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite."
-    
-    # --- O GOOGLE AI NORMAL (Google AI Pro 12m de $16.90) ---
-    if 'google ai' in nome_lower:
-        return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores."
-    
-    # --- DEMAIS PRODUTOS ---
+    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite."
+    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores."
     if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
     if 'framer' in nome_lower: return f"Framer Pro{sufixo_tempo}", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
     if 'canva' in nome_lower: return f"Canva Pro{sufixo_tempo}", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
@@ -123,8 +107,7 @@ def traduzir_e_resumir(nome_original):
     if 'chatprd' in nome_lower: return f"ChatPRD Pro{sufixo_tempo}", "O copiloto de IA definitivo para Product Managers escreverem requisitos e estratégias."
     if 'proton' in nome_lower: return f"Proton Unlimited{sufixo_tempo}", "E-mail criptografado, calendário, drive e VPN em um ecossistema com privacidade máxima."
 
-    # Se a ferramenta for desconhecida, ele imprime o nome com o tempo detectado
-    return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
+    return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
 
 @app.route('/')
 def index():
@@ -133,15 +116,12 @@ def index():
 @app.route('/api/catalogo', method=['GET', 'OPTIONS'])
 def get_catalogo():
     response.content_type = 'application/json'
-    
-    if request.method == 'OPTIONS':
-        return json.dumps({})
+    if request.method == 'OPTIONS': return json.dumps({})
     
     headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
     try:
         resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
-        if resp.status_code != 200:
-            return json.dumps([])
+        if resp.status_code != 200: return json.dumps([])
             
         produtos_fornecedor = resp.json().get("data", [])
         catalogo_tratado = []
@@ -150,8 +130,6 @@ def get_catalogo():
             if p.get("stock", {}).get("inStock", False):
                 custo_usd = float(p.get("yourPrice", 0))
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
-                
-                # O tradutor agora lê o tempo real e aplica as novas regras
                 nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
                 dominio_logo = obter_dominio_logo(nome_ptbr)
                 
@@ -168,40 +146,62 @@ def get_catalogo():
         print(f"Erro ao buscar catálogo: {e}")
         return json.dumps([])
 
+# ROTA 100% SEGURA: O servidor consulta a API e calcula o preço exato sozinho
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
-    if request.method == 'OPTIONS':
-        return {}
-
+    if request.method == 'OPTIONS': return {}
     dados = request.json or {}
     client_id = dados.get("client_id", "")
-    produto_nome = dados.get("produto", "Serviço de Tecnologia")
     produto_id = dados.get("produto_id", "") 
-    quantidade = dados.get("quantidade", 1)
     
     try:
-        valor_total = float(dados.get("valor_total", 0))
-    except (ValueError, TypeError):
-        return {"error": "Valor inválido enviado pelo site."}
+        quantidade = int(dados.get("quantidade", 1))
+    except:
+        return {"error": "Quantidade inválida."}
+        
+    if quantidade <= 0: return {"error": "Quantidade deve ser maior que zero."}
 
-    if valor_total <= 0:
-        return {"error": "O valor da transação deve ser maior que zero."}
+    # SEGURANÇA: Vai na API do parceiro pegar o preço verdadeiro para impedir fraude
+    headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
+    try:
+        resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
+        if resp.status_code != 200:
+            return {"error": "Servidor indisponível. Tente novamente."}
+        produtos_fornecedor = resp.json().get("data", [])
+    except:
+        return {"error": "Falha de comunicação segura."}
 
-    descricao_dinamica = f"{quantidade}x {produto_nome}"
+    produto_real = None
+    for p in produtos_fornecedor:
+        if p.get("slug") == produto_id:
+            produto_real = p
+            break
+
+    if not produto_real:
+        return {"error": "Produto indisponível no momento."}
+
+    # Faz o cálculo matemático blindado no backend
+    custo_usd = float(produto_real.get("yourPrice", 0))
+    preco_base = round((custo_usd * 6.00) + 75.40, 2)
+    
+    if quantidade >= 5:
+        preco_unitario = preco_base * (70.00 / 85.00) # Regra de desconto atacado
+    else:
+        preco_unitario = preco_base
+        
+    valor_total_seguro = round(preco_unitario * quantidade, 2)
+    
+    nome_traduzido, _ = traduzir_e_resumir(produto_real.get("name", ""))
+    descricao_dinamica = f"{quantidade}x {nome_traduzido}"
     email_fantasma = f"comprador_{client_id[:8]}@tecnologia.com"
 
     payment_data = {
-        "transaction_amount": valor_total,
+        "transaction_amount": valor_total_seguro,
         "description": descricao_dinamica,
         "payment_method_id": "pix",
         "external_reference": client_id,
-        "payer": {
-            "email": email_fantasma
-        },
-        "metadata": {
-            "produto_id": produto_id,
-            "quantidade": quantidade
-        }
+        "payer": {"email": email_fantasma},
+        "metadata": {"produto_id": produto_id, "quantidade": quantidade}
     }
 
     request_options = mercadopago.config.RequestOptions()
@@ -210,9 +210,7 @@ def gerar_pix():
     result = sdk.payment().create(payment_data, request_options)
     payment = result.get("response", {})
 
-    if "id" not in payment:
-        return {"error": "Erro ao gerar PIX com o Banco.", "detalhes": payment}
-
+    if "id" not in payment: return {"error": "Erro ao gerar PIX com o Banco.", "detalhes": payment}
     transaction_data = payment.get("point_of_interaction", {}).get("transaction_data", {})
 
     return {
@@ -221,10 +219,10 @@ def gerar_pix():
         "qr_code_base64": transaction_data.get("qr_code_base64", "")
     }
 
+# Rota Limpa: Apenas verifica o pagamento no Mercado Pago. Nenhuma compra automática.
 @app.route('/status/<id>', method=['GET', 'OPTIONS'])
 def status_pagamento(id):
-    if request.method == 'OPTIONS':
-        return {}
+    if request.method == 'OPTIONS': return {}
         
     result = sdk.payment().get(id)
     payment = result.get("response", {})
@@ -234,31 +232,6 @@ def status_pagamento(id):
     
     if status == "approved":
         resposta["codigo_pedido"] = gerar_codigo_pedido(id)
-        
-        produto_id = payment.get("metadata", {}).get("produto_id")
-        quantidade = payment.get("metadata", {}).get("quantidade", 1)
-        
-        if produto_id and not produto_id.startswith("inst_"):
-            headers = {
-                "Authorization": f"Bearer {PARTNER_API_KEY}",
-                "Content-Type": "application/json"
-            }
-            payload_compra = {
-                "productSlug": produto_id,
-                "quantity": int(quantidade),
-                "externalOrderId": str(id) 
-            }
-            
-            try:
-                compra_resp = requests.post(f"{PARTNER_API_URL}/orders", json=payload_compra, headers=headers)
-                dados_compra = compra_resp.json()
-                
-                if dados_compra.get("ok"):
-                    resposta["delivery"] = dados_compra.get("delivery", {})
-                else:
-                    resposta["erro_entrega"] = "Pagamento ok, mas falha na API parceira."
-            except Exception as e:
-                print(f"Erro de integração na compra: {e}")
             
     return resposta
 
