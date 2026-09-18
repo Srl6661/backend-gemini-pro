@@ -6,7 +6,7 @@ import hmac
 import hashlib
 import requests
 import json
-import re  # <--- Adicionado para ler os meses dinamicamente
+import re
 
 app = Bottle()
 
@@ -61,24 +61,39 @@ def obter_dominio_logo(nome_produto):
     if 'google' in nome or 'gemini' in nome: return 'google.com'
     return 'ggsoma.store'
 
-# Dicionário dinâmico que traduz "m" ou "months" e injeta no título
+# Dicionário dinâmico com a nova regra de "30 dias"
 def traduzir_e_resumir(nome_original):
     # Limpa a sujeira do None e converte para minúsculas
     nome_base = str(nome_original).replace("None", "").strip()
     
-    # TRADUTOR AUTOMÁTICO DE TEMPO: Transforma "18 Months" ou "12m" em "18 meses" e "12 meses"
+    # TRADUTOR AUTOMÁTICO DE TEMPO
+    # 1. Trata especificamente 1 mês para "30 dias"
+    nome_base = re.sub(r'\b1\s*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b1\s*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
+    
+    # 2. Trata os demais para "meses"
     nome_base = re.sub(r'(\d+)\s*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\d+)\s*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     
-    # Extrai exatamente a quantidade de meses para colocar no título final (ex: " (18 meses)")
-    match_tempo = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
-    sufixo_tempo = f" ({match_tempo.group(1)} meses)" if match_tempo else ""
+    # 3. Extrai para o sufixo bonitão
+    match_dias = re.search(r'(30\s*dias)', nome_base, re.IGNORECASE)
+    match_meses = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
+    
+    sufixo_tempo = ""
+    if match_dias:
+        sufixo_tempo = " (30 dias)"
+    elif match_meses:
+        sufixo_tempo = f" ({match_meses.group(1)} meses)"
     
     nome_lower = nome_base.lower()
     
-    # --- O SEU CARRO CHEFE ---
-    if 'gemini' in nome_lower or 'google' in nome_lower: 
+    # --- O SEU CARRO CHEFE (Gemini Pro 18 Months de $1.60) ---
+    if 'gemini' in nome_lower: 
         return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite."
+    
+    # --- O GOOGLE AI NORMAL (Google AI Pro 12m de $16.90) ---
+    if 'google ai' in nome_lower:
+        return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores."
     
     # --- DEMAIS PRODUTOS ---
     if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
@@ -109,7 +124,7 @@ def traduzir_e_resumir(nome_original):
     if 'proton' in nome_lower: return f"Proton Unlimited{sufixo_tempo}", "E-mail criptografado, calendário, drive e VPN em um ecossistema com privacidade máxima."
 
     # Se a ferramenta for desconhecida, ele imprime o nome com o tempo detectado
-    return nome_base, "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
+    return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
 
 @app.route('/')
 def index():
@@ -136,7 +151,7 @@ def get_catalogo():
                 custo_usd = float(p.get("yourPrice", 0))
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 
-                # O tradutor agora lê o tempo real ("18 meses", "3 meses") e insere no nome
+                # O tradutor agora lê o tempo real e aplica as novas regras
                 nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
                 dominio_logo = obter_dominio_logo(nome_ptbr)
                 
