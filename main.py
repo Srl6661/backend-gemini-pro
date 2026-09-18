@@ -29,7 +29,6 @@ def gerar_codigo_pedido(payment_id):
     assinatura = hmac.new(SECRET_KEY.encode(), str(payment_id).encode(), hashlib.sha256).hexdigest()[:8].upper()
     return f"GP-{assinatura}"
 
-# Dicionário invisível: Puxa o link do logo original, mas não exibe o texto no site
 def obter_dominio_logo(nome_produto):
     nome = nome_produto.lower()
     if 'chatgpt' in nome or 'openai' in nome: return 'openai.com'
@@ -61,6 +60,48 @@ def obter_dominio_logo(nome_produto):
     if 'google' in nome or 'gemini' in nome: return 'google.com'
     return 'ggsoma.store'
 
+# Dicionário que traduz o nome e cria um resumo matador de vendas em PT-BR
+def traduzir_e_resumir(nome_original):
+    nome = str(nome_original).lower().replace("none", "").strip()
+    
+    if 'chatgpt' in nome: 
+        return "ChatGPT Plus", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
+    if 'gemini' in nome or 'google' in nome: 
+        return "Google Gemini Advanced", "A IA mais poderosa do Google. Resolve problemas complexos, programa e cria conteúdos com altíssima precisão."
+    if 'framer' in nome: 
+        return "Framer Pro", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
+    if 'canva' in nome: 
+        return "Canva Pro", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
+    if 'gamma' in nome: 
+        return "Gamma Pro", "Gere apresentações, documentos e sites inteiros em segundos utilizando o poder da Inteligência Artificial."
+    if 'elevenlabs' in nome: 
+        return "ElevenLabs Creator", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
+    if 'runway' in nome: 
+        return "Runway Pro", "Geração e edição de vídeos impressionantes a partir de textos e imagens utilizando IA cinematográfica."
+    if 'telegram' in nome: 
+        return "Telegram Premium", "Destaque seu perfil, faça downloads mais rápidos, transcrição de áudios e ganhe limites dobrados."
+    if 'linkedin' in nome: 
+        return "LinkedIn Premium", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
+    if 'duolingo' in nome: 
+        return "Duolingo Super", "Aprenda novos idiomas sem anúncios, com vidas ilimitadas e lições offline no seu ritmo."
+    if 'nord' in nome or 'vpn' in nome: 
+        return "NordVPN Premium", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
+    if 'replit' in nome: 
+        return "Replit Core", "Ambiente de desenvolvimento na nuvem com IA integrada para você programar direto do navegador."
+    if 'supabase' in nome: 
+        return "Supabase Pro", "Banco de dados e autenticação escalável para desenvolvedores. A melhor alternativa ao Firebase."
+    if 'n8n' in nome: 
+        return "n8n Starter", "Automatize tarefas repetitivas e integre centenas de aplicativos de forma simples e visual."
+    if 'lovable' in nome: 
+        return "Lovable Pro", "Criação de aplicativos e sistemas completos impulsionados por inteligência artificial."
+    if 'bolt' in nome: 
+        return "Bolt.new Pro", "Desenvolvimento web full-stack direto no navegador com assistência avançada de IA."
+    if 'quillbot' in nome: 
+        return "QuillBot Premium", "Reescreva textos, corrija a gramática e melhore sua fluência em inglês com um clique."
+    
+    # Se for uma ferramenta desconhecida, ele limpa o nome e dá uma descrição padrão focada em conversão
+    return nome_original.replace("None", "").strip(), "Licença premium oficial e original. Entrega e ativação 100% automática logo após o pagamento via Pix."
+
 @app.route('/')
 def index():
     return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
@@ -86,17 +127,18 @@ def get_catalogo():
                 custo_usd = float(p.get("yourPrice", 0))
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 
-                # Limpeza do nome: tira qualquer "None" que vem da loja parceira
-                nome_limpo = str(p.get("name", "")).replace("None", "").strip()
-                dominio_logo = obter_dominio_logo(nome_limpo)
+                # Traduz o nome e puxa o resumo em PT-BR
+                nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                
+                dominio_logo = obter_dominio_logo(nome_ptbr)
                 
                 catalogo_tratado.append({
                     "id": p["slug"],
-                    "nome": nome_limpo,
+                    "nome": nome_ptbr,
                     "precoBase": preco_calculado,
                     "logoDomain": dominio_logo,
                     "estoque": True,
-                    "descricao": p.get("description", "")
+                    "descricao": resumo_ptbr
                 })
         return json.dumps(catalogo_tratado)
     except Exception as e:
