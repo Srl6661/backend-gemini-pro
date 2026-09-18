@@ -51,21 +51,21 @@ def get_catalogo():
         
         for p in produtos_fornecedor:
             if p.get("stock", {}).get("inStock", False):
-                # 1. Pega o preço de custo real do produto
                 custo_usd = float(p.get("yourPrice", 0))
-                
-                # 2. Fórmula de Lucro: (Dólar a R$6) + (Lucro Fixo de R$ 75,40)
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 
-                # 3. Puxa o Emoji/Logo oficial da plataforma parceira
-                emoji = p.get("emoji", {}).get("normal", "📦")
-                nome_com_emoji = f"{emoji} {p['name']}"
+                # Mapeamento inteligente para achar o logo perfeito da empresa
+                provider_key = p.get("provider", {}).get("key", "").lower()
+                dominio = provider_key + ".com"
+                if provider_key == "telegram": dominio = "telegram.org"
+                elif provider_key == "chatgpt": dominio = "openai.com"
+                elif provider_key == "google": dominio = "google.com"
                 
                 catalogo_tratado.append({
                     "id": p["slug"],
-                    "nome": nome_com_emoji,
+                    "nome": p["name"], # Aqui foi removido a palavra "None"
                     "precoBase": preco_calculado,
-                    "dominio": p["provider"]["key"] + ".com",
+                    "dominio": dominio,
                     "estoque": True,
                     "descricao": p.get("description", "")
                 })
