@@ -59,7 +59,9 @@ def obter_dominio_logo(nome_produto):
     if 'bolt' in nome: return 'bolt.new'
     if 'canva' in nome: return 'canva.com'
     if 'google' in nome or 'gemini' in nome: return 'google.com'
-    return 'ggsoma.store'
+    
+    # 🔒 VAZAMENTO CORRIGIDO: Retorna um domínio genérico caso não encontre a marca.
+    return 'tech.com' 
 
 def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
@@ -146,7 +148,7 @@ def get_catalogo():
         print(f"Erro ao buscar catálogo: {e}")
         return json.dumps([])
 
-# ROTA 100% SEGURA: O servidor consulta a API e calcula o preço exato sozinho
+# 🔒 ROTA BLINDADA: Consulta preço direto da fonte na hora de gerar a cobrança
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
     if request.method == 'OPTIONS': return {}
@@ -161,7 +163,6 @@ def gerar_pix():
         
     if quantidade <= 0: return {"error": "Quantidade deve ser maior que zero."}
 
-    # SEGURANÇA: Vai na API do parceiro pegar o preço verdadeiro para impedir fraude
     headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
     try:
         resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
@@ -180,12 +181,11 @@ def gerar_pix():
     if not produto_real:
         return {"error": "Produto indisponível no momento."}
 
-    # Faz o cálculo matemático blindado no backend
     custo_usd = float(produto_real.get("yourPrice", 0))
     preco_base = round((custo_usd * 6.00) + 75.40, 2)
     
     if quantidade >= 5:
-        preco_unitario = preco_base * (70.00 / 85.00) # Regra de desconto atacado
+        preco_unitario = preco_base * (70.00 / 85.00) 
     else:
         preco_unitario = preco_base
         
@@ -219,7 +219,6 @@ def gerar_pix():
         "qr_code_base64": transaction_data.get("qr_code_base64", "")
     }
 
-# Rota Limpa: Apenas verifica o pagamento no Mercado Pago. Nenhuma compra automática.
 @app.route('/status/<id>', method=['GET', 'OPTIONS'])
 def status_pagamento(id):
     if request.method == 'OPTIONS': return {}
