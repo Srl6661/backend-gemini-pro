@@ -10,7 +10,7 @@ import re
 
 app = Bottle()
 
-# Chaves de API das três plataformas
+# Chaves de API
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') # GGSoma
 CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY') # Canboso
@@ -99,8 +99,9 @@ def traduzir_e_resumir(nome_original):
     
     nome_lower = nome_base.lower()
     
-    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite."
-    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores."
+    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
+    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
+    
     if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
     if 'framer' in nome_lower: return f"Framer Pro{sufixo_tempo}", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
     if 'canva' in nome_lower: return f"Canva Pro{sufixo_tempo}", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
@@ -130,6 +131,23 @@ def traduzir_e_resumir(nome_original):
 
     return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
 
+# 🚀 NOVA REGRA DE PREÇOS INTELIGENTE
+def calcular_preco_dinamico(custo_usd):
+    custo_brl = custo_usd * 6.00
+    
+    if custo_usd <= 2.00:
+        # Para produtos muito baratos, mantemos os R$ 75 de lucro garantidos
+        return round(custo_brl + 75.40, 2)
+    elif custo_usd <= 10.00:
+        # Multiplica por 4x (Lucro bom, sem assustar)
+        return round(custo_brl * 4.0, 2)
+    elif custo_usd <= 20.00:
+        # Multiplica por 3x (Lucro alto)
+        return round(custo_brl * 3.0, 2)
+    else:
+        # Multiplica por 2.5x (Para produtos mais caros, lucro gigante, mas mantendo vendável)
+        return round(custo_brl * 2.5, 2)
+
 @app.route('/')
 def index():
     return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
@@ -140,9 +158,8 @@ def get_catalogo():
     if request.method == 'OPTIONS': return json.dumps({})
     
     catalogo_tratado = []
-    produtos_processados = set() # Evita duplicatas caso os fornecedores tenham o mesmo produto
+    produtos_processados = set() 
     
-    # 1. Puxa do Fornecedor Primário (GGSoma)
     if PARTNER_API_KEY:
         try:
             headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
@@ -151,7 +168,11 @@ def get_catalogo():
                 for p in resp_gg.json().get("data", []):
                     if p.get("stock", {}).get("inStock", False):
                         custo_usd = float(p.get("yourPrice", 0))
-                        preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
+                        
+                        if custo_usd > 30: continue
+                        
+                        # 💵 USA A NOVA FÓRMULA DE LUCRO
+                        preco_calculado = calcular_preco_dinamico(custo_usd)
                         
                         nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
                         if nome_ptbr not in produtos_processados:
@@ -168,20 +189,22 @@ def get_catalogo():
         except Exception as e:
             print(f"Erro GGSoma: {e}")
 
-    # 2. Puxa do Fornecedor Secundário (Canboso)
     if CANBOSO_API_KEY:
         try:
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
             if resp_canboso.status_code == 200:
                 for p in resp_canboso.json().get("products", []):
-                    estoque = p.get("availability", {}).get("available", 0)
-                    if estoque > 0:
+                    estoque = p.get("availability", {}).get("available")
+                    if estoque is None or estoque != 0: 
                         moeda = p.get("price", {}).get("currency", "USD")
                         valor_bruto = float(p.get("price", {}).get("amount", 0))
                         
-                        # Conversão caso a carteira Canboso esteja em VND (1 USD ~ 25000 VND)
                         custo_usd = valor_bruto / 25000.0 if moeda == "VND" else valor_bruto
-                        preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
+                        
+                        if custo_usd > 30: continue
+
+                        # 💵 USA A NOVA FÓRMULA DE LUCRO
+                        preco_calculado = calcular_preco_dinamico(custo_usd)
 
                         nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
                         if nome_ptbr not in produtos_processados:
@@ -217,7 +240,6 @@ def gerar_pix():
     custo_usd = None
     nome_original = ""
 
-    # 1. Procura o custo real na GGSoma
     if PARTNER_API_KEY and custo_usd is None:
         try:
             resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers={"Authorization": f"Bearer {PARTNER_API_KEY}"}, timeout=10)
@@ -229,7 +251,6 @@ def gerar_pix():
                         break
         except: pass
 
-    # 2. Procura o custo real na Canboso caso não seja da GGSoma
     if CANBOSO_API_KEY and custo_usd is None:
         try:
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
@@ -246,8 +267,9 @@ def gerar_pix():
     if custo_usd is None:
         return {"error": "Produto indisponível no estoque dos fornecedores."}
 
-    # Aplica a margem de lucro blindada
-    preco_base = round((custo_usd * 6.00) + 75.40, 2)
+    # 💵 USA A NOVA FÓRMULA DE LUCRO NA HORA DE COBRAR O PIX
+    preco_base = calcular_preco_dinamico(custo_usd)
+    
     preco_unitario = preco_base * (70.00 / 85.00) if quantidade >= 5 else preco_base
     valor_total_seguro = round(preco_unitario * quantidade, 2)
     
