@@ -10,9 +10,12 @@ import re
 
 app = Bottle()
 
+# Chaves de API das três plataformas
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
-PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY')
+PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') # GGSoma
+CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY') # Canboso
 SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-secreta-padrao-123')
+
 PARTNER_API_URL = "https://ggsoma.store/api/partner/v1"
 
 if ACCESS_TOKEN:
@@ -59,10 +62,8 @@ def obter_dominio_logo(nome_produto):
     if 'bolt' in nome: return 'bolt.new'
     if 'canva' in nome: return 'canva.com'
     if 'google' in nome or 'gemini' in nome: return 'google.com'
-    
     return 'tech.com' 
 
-# NOVA FUNÇÃO: Define a categoria do produto
 def obter_categoria(nome_produto):
     nome = nome_produto.lower()
     if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus']): 
@@ -79,7 +80,6 @@ def obter_categoria(nome_produto):
         return 'Educação & Idiomas'
     if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog']): 
         return 'Produtividade'
-    
     return 'Licença Premium'
 
 def traduzir_e_resumir(nome_original):
@@ -139,35 +139,66 @@ def get_catalogo():
     response.content_type = 'application/json'
     if request.method == 'OPTIONS': return json.dumps({})
     
-    headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
-    try:
-        resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
-        if resp.status_code != 200: return json.dumps([])
-            
-        produtos_fornecedor = resp.json().get("data", [])
-        catalogo_tratado = []
-        
-        for p in produtos_fornecedor:
-            if p.get("stock", {}).get("inStock", False):
-                custo_usd = float(p.get("yourPrice", 0))
-                preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
-                nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
-                dominio_logo = obter_dominio_logo(nome_ptbr)
-                categoria_produto = obter_categoria(nome_ptbr) # <- Puxando a categoria
-                
-                catalogo_tratado.append({
-                    "id": p["slug"],
-                    "nome": nome_ptbr,
-                    "precoBase": preco_calculado,
-                    "logoDomain": dominio_logo,
-                    "categoria": categoria_produto, # <- Enviando pro site
-                    "estoque": True,
-                    "descricao": resumo_ptbr
-                })
-        return json.dumps(catalogo_tratado)
-    except Exception as e:
-        print(f"Erro ao buscar catálogo: {e}")
-        return json.dumps([])
+    catalogo_tratado = []
+    produtos_processados = set() # Evita duplicatas caso os fornecedores tenham o mesmo produto
+    
+    # 1. Puxa do Fornecedor Primário (GGSoma)
+    if PARTNER_API_KEY:
+        try:
+            headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
+            resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers, timeout=10)
+            if resp_gg.status_code == 200:
+                for p in resp_gg.json().get("data", []):
+                    if p.get("stock", {}).get("inStock", False):
+                        custo_usd = float(p.get("yourPrice", 0))
+                        preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
+                        
+                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                        if nome_ptbr not in produtos_processados:
+                            catalogo_tratado.append({
+                                "id": p["slug"],
+                                "nome": nome_ptbr,
+                                "precoBase": preco_calculado,
+                                "logoDomain": obter_dominio_logo(nome_ptbr),
+                                "categoria": obter_categoria(nome_ptbr),
+                                "estoque": True,
+                                "descricao": resumo_ptbr
+                            })
+                            produtos_processados.add(nome_ptbr)
+        except Exception as e:
+            print(f"Erro GGSoma: {e}")
+
+    # 2. Puxa do Fornecedor Secundário (Canboso)
+    if CANBOSO_API_KEY:
+        try:
+            resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
+            if resp_canboso.status_code == 200:
+                for p in resp_canboso.json().get("products", []):
+                    estoque = p.get("availability", {}).get("available", 0)
+                    if estoque > 0:
+                        moeda = p.get("price", {}).get("currency", "USD")
+                        valor_bruto = float(p.get("price", {}).get("amount", 0))
+                        
+                        # Conversão caso a carteira Canboso esteja em VND (1 USD ~ 25000 VND)
+                        custo_usd = valor_bruto / 25000.0 if moeda == "VND" else valor_bruto
+                        preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
+
+                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                        if nome_ptbr not in produtos_processados:
+                            catalogo_tratado.append({
+                                "id": str(p["productId"]),
+                                "nome": nome_ptbr,
+                                "precoBase": preco_calculado,
+                                "logoDomain": obter_dominio_logo(nome_ptbr),
+                                "categoria": obter_categoria(nome_ptbr),
+                                "estoque": True,
+                                "descricao": resumo_ptbr
+                            })
+                            produtos_processados.add(nome_ptbr)
+        except Exception as e:
+            print(f"Erro Canboso: {e}")
+
+    return json.dumps(catalogo_tratado)
 
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
@@ -183,35 +214,44 @@ def gerar_pix():
         
     if quantidade <= 0: return {"error": "Quantidade deve ser maior que zero."}
 
-    headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
-    try:
-        resp = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers)
-        if resp.status_code != 200:
-            return {"error": "Servidor indisponível. Tente novamente."}
-        produtos_fornecedor = resp.json().get("data", [])
-    except:
-        return {"error": "Falha de comunicação segura."}
+    custo_usd = None
+    nome_original = ""
 
-    produto_real = None
-    for p in produtos_fornecedor:
-        if p.get("slug") == produto_id:
-            produto_real = p
-            break
+    # 1. Procura o custo real na GGSoma
+    if PARTNER_API_KEY and custo_usd is None:
+        try:
+            resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers={"Authorization": f"Bearer {PARTNER_API_KEY}"}, timeout=10)
+            if resp_gg.status_code == 200:
+                for p in resp_gg.json().get("data", []):
+                    if p.get("slug") == produto_id:
+                        custo_usd = float(p.get("yourPrice", 0))
+                        nome_original = p.get("name", "")
+                        break
+        except: pass
 
-    if not produto_real:
-        return {"error": "Produto indisponível no momento."}
+    # 2. Procura o custo real na Canboso caso não seja da GGSoma
+    if CANBOSO_API_KEY and custo_usd is None:
+        try:
+            resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
+            if resp_canboso.status_code == 200:
+                for p in resp_canboso.json().get("products", []):
+                    if str(p.get("productId")) == produto_id:
+                        moeda = p.get("price", {}).get("currency", "USD")
+                        valor = float(p.get("price", {}).get("amount", 0))
+                        custo_usd = valor / 25000.0 if moeda == "VND" else valor
+                        nome_original = p.get("name", "")
+                        break
+        except: pass
 
-    custo_usd = float(produto_real.get("yourPrice", 0))
+    if custo_usd is None:
+        return {"error": "Produto indisponível no estoque dos fornecedores."}
+
+    # Aplica a margem de lucro blindada
     preco_base = round((custo_usd * 6.00) + 75.40, 2)
-    
-    if quantidade >= 5:
-        preco_unitario = preco_base * (70.00 / 85.00) 
-    else:
-        preco_unitario = preco_base
-        
+    preco_unitario = preco_base * (70.00 / 85.00) if quantidade >= 5 else preco_base
     valor_total_seguro = round(preco_unitario * quantidade, 2)
     
-    nome_traduzido, _ = traduzir_e_resumir(produto_real.get("name", ""))
+    nome_traduzido, _ = traduzir_e_resumir(nome_original)
     descricao_dinamica = f"{quantidade}x {nome_traduzido}"
     email_fantasma = f"comprador_{client_id[:8]}@tecnologia.com"
 
@@ -230,7 +270,7 @@ def gerar_pix():
     result = sdk.payment().create(payment_data, request_options)
     payment = result.get("response", {})
 
-    if "id" not in payment: return {"error": "Erro ao gerar PIX com o Banco.", "detalhes": payment}
+    if "id" not in payment: return {"error": "Erro ao gerar PIX com o Banco."}
     transaction_data = payment.get("point_of_interaction", {}).get("transaction_data", {})
 
     return {
