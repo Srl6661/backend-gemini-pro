@@ -60,8 +60,27 @@ def obter_dominio_logo(nome_produto):
     if 'canva' in nome: return 'canva.com'
     if 'google' in nome or 'gemini' in nome: return 'google.com'
     
-    # 🔒 VAZAMENTO CORRIGIDO: Retorna um domínio genérico caso não encontre a marca.
     return 'tech.com' 
+
+# NOVA FUNÇÃO: Define a categoria do produto
+def obter_categoria(nome_produto):
+    nome = nome_produto.lower()
+    if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus']): 
+        return 'Inteligência Artificial'
+    if any(x in nome for x in ['canva', 'framer', 'runway', 'magic patterns', 'elevenlabs', 'mobbin']): 
+        return 'Design & Criatividade'
+    if any(x in nome for x in ['supabase', 'replit', 'railway', 'bolt', 'lovable']): 
+        return 'Desenvolvimento'
+    if any(x in nome for x in ['n8n', 'gumloop']): 
+        return 'Automação'
+    if any(x in nome for x in ['telegram', 'linkedin', 'proton', 'nord', 'vpn']): 
+        return 'Redes & Segurança'
+    if any(x in nome for x in ['duolingo', 'quillbot']): 
+        return 'Educação & Idiomas'
+    if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog']): 
+        return 'Produtividade'
+    
+    return 'Licença Premium'
 
 def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
@@ -134,12 +153,14 @@ def get_catalogo():
                 preco_calculado = round((custo_usd * 6.00) + 75.40, 2)
                 nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
                 dominio_logo = obter_dominio_logo(nome_ptbr)
+                categoria_produto = obter_categoria(nome_ptbr) # <- Puxando a categoria
                 
                 catalogo_tratado.append({
                     "id": p["slug"],
                     "nome": nome_ptbr,
                     "precoBase": preco_calculado,
                     "logoDomain": dominio_logo,
+                    "categoria": categoria_produto, # <- Enviando pro site
                     "estoque": True,
                     "descricao": resumo_ptbr
                 })
@@ -148,7 +169,6 @@ def get_catalogo():
         print(f"Erro ao buscar catálogo: {e}")
         return json.dumps([])
 
-# 🔒 ROTA BLINDADA: Consulta preço direto da fonte na hora de gerar a cobrança
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
     if request.method == 'OPTIONS': return {}
