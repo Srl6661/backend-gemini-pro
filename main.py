@@ -10,10 +10,12 @@ import re
 
 app = Bottle()
 
-# Chaves de API
+# 🔑 Chaves de API das QUATRO plataformas
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
-PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') # GGSoma
-CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY') # Canboso
+PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') 
+CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY') 
+BUNAI_API_KEY = os.environ.get('BUNAI_API_KEY')     
+OPTIMUS_API_KEY = os.environ.get('OPTIMUS_API_KEY') # Optimus Prime
 SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-secreta-padrao-123')
 
 PARTNER_API_URL = "https://ggsoma.store/api/partner/v1"
@@ -62,33 +64,49 @@ def obter_dominio_logo(nome_produto):
     if 'bolt' in nome: return 'bolt.new'
     if 'canva' in nome: return 'canva.com'
     if 'google' in nome or 'gemini' in nome: return 'google.com'
+    if 'capcut' in nome: return 'capcut.com'
+    if 'grok' in nome: return 'x.ai'
+    if 'coursera' in nome: return 'coursera.org'
+    if 'youtube' in nome: return 'youtube.com'
+    if 'cursor' in nome: return 'cursor.com'
+    if 'notion' in nome: return 'notion.so'
+    if 'arize' in nome: return 'arize.com'
+    if 'airtable' in nome: return 'airtable.com'
+    if 'descript' in nome: return 'descript.com'
+    if 'microsoft' in nome: return 'microsoft.com'
+    if 'wispr' in nome: return 'wisprflow.ai'
+    if 'leonardo' in nome: return 'leonardo.ai'
+    if 'adobe' in nome: return 'adobe.com'
+    if 'higgsfield' in nome: return 'higgsfield.ai'
     return 'tech.com' 
 
 def obter_categoria(nome_produto):
     nome = nome_produto.lower()
-    if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus']): 
+    if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus', 'grok', 'cursor', 'wispr']): 
         return 'Inteligência Artificial'
-    if any(x in nome for x in ['canva', 'framer', 'runway', 'magic patterns', 'elevenlabs', 'mobbin']): 
+    if any(x in nome for x in ['canva', 'framer', 'runway', 'magic patterns', 'elevenlabs', 'mobbin', 'capcut', 'descript', 'leonardo', 'adobe', 'higgsfield']): 
         return 'Design & Criatividade'
-    if any(x in nome for x in ['supabase', 'replit', 'railway', 'bolt', 'lovable']): 
+    if any(x in nome for x in ['supabase', 'replit', 'railway', 'bolt', 'lovable', 'arize']): 
         return 'Desenvolvimento'
     if any(x in nome for x in ['n8n', 'gumloop']): 
         return 'Automação'
     if any(x in nome for x in ['telegram', 'linkedin', 'proton', 'nord', 'vpn']): 
         return 'Redes & Segurança'
-    if any(x in nome for x in ['duolingo', 'quillbot']): 
+    if any(x in nome for x in ['duolingo', 'quillbot', 'coursera']): 
         return 'Educação & Idiomas'
-    if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog']): 
+    if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog', 'notion', 'airtable', 'microsoft']): 
         return 'Produtividade'
+    if 'youtube' in nome: return 'Entretenimento'
     return 'Licença Premium'
 
 def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
-    
+    nome_base = re.sub(r'(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D|\(NW\)|\(FW\))', '', nome_base, flags=re.IGNORECASE).strip()
     nome_base = re.sub(r'\b1\s*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b1\s*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\d+)\s*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\d+)\s*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'>', '-', nome_base)
     
     match_dias = re.search(r'(30\s*dias)', nome_base, re.IGNORECASE)
     match_meses = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
@@ -99,9 +117,8 @@ def traduzir_e_resumir(nome_original):
     
     nome_lower = nome_base.lower()
     
-    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Nosso carro-chefe! Pacote completo com 7 ferramentas premium: Gemini Advanced, Google Flow (Veo), Health Premium, Meet Premium, Agenda Avançada, Gemini no Docs/Gmail e Armazenamento Compartilhado. + BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
-    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial do Google AI Studio para desenvolvedores. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
-    
+    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Pacote completo: Gemini Advanced, Veo, Meet/Agenda Premium e nuvem ampliada. BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
+    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial para desenvolvedores. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
     if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
     if 'framer' in nome_lower: return f"Framer Pro{sufixo_tempo}", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
     if 'canva' in nome_lower: return f"Canva Pro{sufixo_tempo}", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
@@ -109,7 +126,7 @@ def traduzir_e_resumir(nome_original):
     if 'elevenlabs' in nome_lower: return f"ElevenLabs Creator{sufixo_tempo}", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
     if 'runway' in nome_lower: return f"Runway Pro{sufixo_tempo}", "Geração e edição de vídeos impressionantes a partir de textos e imagens utilizando IA cinematográfica."
     if 'telegram' in nome_lower: return f"Telegram Premium{sufixo_tempo}", "Destaque seu perfil, faça downloads mais rápidos, transcrição de áudios e ganhe limites dobrados."
-    if 'linkedin' in nome_lower or 'career' in nome_lower: return f"LinkedIn Premium{sufixo_tempo}", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
+    if 'linkedin' in nome_lower: return f"LinkedIn Premium{sufixo_tempo}", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
     if 'duolingo' in nome_lower: return f"Duolingo Super{sufixo_tempo}", "Aprenda novos idiomas sem anúncios, com vidas ilimitadas e lições offline no seu ritmo."
     if 'nord' in nome_lower or 'vpn' in nome_lower: return f"NordVPN Premium{sufixo_tempo}", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
     if 'replit' in nome_lower: return f"Replit Core{sufixo_tempo}", "Ambiente de desenvolvimento na nuvem com IA integrada para você programar direto do navegador."
@@ -128,25 +145,35 @@ def traduzir_e_resumir(nome_original):
     if 'mobbin' in nome_lower: return f"Mobbin 10x Seat{sufixo_tempo}", "A maior biblioteca de referências de design UI/UX do mundo para aplicativos móveis e web."
     if 'chatprd' in nome_lower: return f"ChatPRD Pro{sufixo_tempo}", "O copiloto de IA definitivo para Product Managers escreverem requisitos e estratégias."
     if 'proton' in nome_lower: return f"Proton Unlimited{sufixo_tempo}", "E-mail criptografado, calendário, drive e VPN em um ecossistema com privacidade máxima."
+    if 'capcut' in nome_lower: return f"CapCut Premium{sufixo_tempo}", "Acesse todos os efeitos Pro, remova fundos facilmente e edite vídeos como um profissional."
+    if 'grok' in nome_lower: return f"Grok AI (xAI){sufixo_tempo}", "Acesso ao poderoso modelo de Inteligência Artificial sem filtros desenvolvido pela xAI (Twitter/X)."
+    if 'coursera' in nome_lower: return f"Coursera Premium", "Acesso ilimitado a milhares de cursos, projetos guiados e certificados nas melhores universidades."
+    if 'youtube' in nome_lower: return f"YouTube Premium{sufixo_tempo}", "Assista a vídeos sem anúncios, baixe para ver offline e aproveite o YouTube Music Premium."
+    if 'cursor' in nome_lower: return f"Cursor Pro{sufixo_tempo}", "O editor de código revolucionário impulsionado por IA que escreve software junto com você."
+    if 'notion' in nome_lower: return f"Notion Business{sufixo_tempo}", "O espaço de trabalho definitivo. Notas, wikis e gerenciamento de projetos com IA integrada."
+    if 'arize' in nome_lower: return f"Arize Pro{sufixo_tempo}", "Plataforma avançada de observabilidade e avaliação de modelos de Inteligência Artificial."
+    if 'airtable' in nome_lower: return f"Airtable Team{sufixo_tempo}", "Crie aplicativos poderosos para o seu negócio conectando seus dados de forma visual."
+    if 'descript' in nome_lower: return f"Descript Creator{sufixo_tempo}", "A maneira mais fácil e rápida de gravar, transcrever e editar vídeos e podcasts."
+    if 'microsoft 365' in nome_lower: return f"Microsoft 365 Premium", "O pacote Office completo com Word, Excel, PowerPoint e armazenamento em nuvem seguro."
+    if 'wispr' in nome_lower: return f"Wispr Flow Pro{sufixo_tempo}", "Ditado por voz revolucionário. Fale e deixe a IA formatar e escrever por você no Mac ou Windows."
+    if 'leonardo' in nome_lower: return f"Leonardo AI Premium{sufixo_tempo}", "Geração de imagens incríveis e artes digitais usando modelos de IA de ponta."
+    if 'adobe express' in nome_lower: return f"Adobe Express Premium{sufixo_tempo}", "Crie posts sociais, vídeos curtos, flyers e logos em minutos com IA generativa da Adobe."
+    if 'higgsfield' in nome_lower: return f"Higgsfield Pro{sufixo_tempo}", "Plataforma de criação de vídeos cinemáticos e comerciais por Inteligência Artificial."
 
     return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
 
-# 🚀 NOVA REGRA DE PREÇOS INTELIGENTE
 def calcular_preco_dinamico(custo_usd):
     custo_brl = custo_usd * 6.00
-    
-    if custo_usd <= 2.00:
-        # Para produtos muito baratos, mantemos os R$ 75 de lucro garantidos
+    if custo_usd <= 2.00: 
         return round(custo_brl + 75.40, 2)
-    elif custo_usd <= 10.00:
-        # Multiplica por 4x (Lucro bom, sem assustar)
+    elif custo_usd <= 10.00: 
         return round(custo_brl * 4.0, 2)
-    elif custo_usd <= 20.00:
-        # Multiplica por 3x (Lucro alto)
+    elif custo_usd <= 20.00: 
         return round(custo_brl * 3.0, 2)
-    else:
-        # Multiplica por 2.5x (Para produtos mais caros, lucro gigante, mas mantendo vendável)
-        return round(custo_brl * 2.5, 2)
+    elif custo_usd <= 50.00: 
+        return round(custo_brl * 2.0, 2)
+    else: 
+        return round(custo_brl * 1.5, 2)
 
 @app.route('/')
 def index():
@@ -160,6 +187,7 @@ def get_catalogo():
     catalogo_tratado = []
     produtos_processados = set() 
     
+    # 1. MOTOR GGSOMA
     if PARTNER_API_KEY:
         try:
             headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
@@ -168,13 +196,9 @@ def get_catalogo():
                 for p in resp_gg.json().get("data", []):
                     if p.get("stock", {}).get("inStock", False):
                         custo_usd = float(p.get("yourPrice", 0))
-                        
-                        if custo_usd > 30: continue
-                        
-                        # 💵 USA A NOVA FÓRMULA DE LUCRO
                         preco_calculado = calcular_preco_dinamico(custo_usd)
-                        
                         nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                        
                         if nome_ptbr not in produtos_processados:
                             catalogo_tratado.append({
                                 "id": p["slug"],
@@ -186,9 +210,9 @@ def get_catalogo():
                                 "descricao": resumo_ptbr
                             })
                             produtos_processados.add(nome_ptbr)
-        except Exception as e:
-            print(f"Erro GGSoma: {e}")
+        except Exception as e: print(f"Erro GGSoma: {e}")
 
+    # 2. MOTOR CANBOSO
     if CANBOSO_API_KEY:
         try:
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
@@ -198,15 +222,11 @@ def get_catalogo():
                     if estoque is None or estoque != 0: 
                         moeda = p.get("price", {}).get("currency", "USD")
                         valor_bruto = float(p.get("price", {}).get("amount", 0))
-                        
                         custo_usd = valor_bruto / 25000.0 if moeda == "VND" else valor_bruto
                         
-                        if custo_usd > 30: continue
-
-                        # 💵 USA A NOVA FÓRMULA DE LUCRO
                         preco_calculado = calcular_preco_dinamico(custo_usd)
-
                         nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                        
                         if nome_ptbr not in produtos_processados:
                             catalogo_tratado.append({
                                 "id": str(p["productId"]),
@@ -218,8 +238,65 @@ def get_catalogo():
                                 "descricao": resumo_ptbr
                             })
                             produtos_processados.add(nome_ptbr)
-        except Exception as e:
-            print(f"Erro Canboso: {e}")
+        except Exception as e: print(f"Erro Canboso: {e}")
+
+    # 3. MOTOR BUNAI STORE
+    if BUNAI_API_KEY:
+        try:
+            headers_bunai = {"X-API-Key": BUNAI_API_KEY}
+            resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=100", headers=headers_bunai, timeout=10)
+            if resp_bunai.status_code == 200:
+                for p in resp_bunai.json():
+                    estoque_valido = p.get("infinite_stock", False) or p.get("stock_count", 0) > 0
+                    if estoque_valido:
+                        custo_usd = float(p.get("price", 0))
+                        
+                        preco_calculado = calcular_preco_dinamico(custo_usd)
+                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("display_name", ""))
+                        
+                        if nome_ptbr not in produtos_processados:
+                            catalogo_tratado.append({
+                                "id": str(p["product_id"]),
+                                "nome": nome_ptbr,
+                                "precoBase": preco_calculado,
+                                "logoDomain": obter_dominio_logo(nome_ptbr),
+                                "categoria": obter_categoria(nome_ptbr),
+                                "estoque": True,
+                                "descricao": resumo_ptbr
+                            })
+                            produtos_processados.add(nome_ptbr)
+        except Exception as e: print(f"Erro Bunai: {e}")
+
+    # 4. MOTOR OPTIMUS PRIME
+    if OPTIMUS_API_KEY:
+        try:
+            headers_optimus = {"X-API-Key": OPTIMUS_API_KEY}
+            resp_optimus = requests.get("https://optimusprime.click/api/telegram-buyer/products", headers=headers_optimus, timeout=10)
+            if resp_optimus.status_code == 200:
+                data_optimus = resp_optimus.json()
+                prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
+                for p in prod_list:
+                    # Verifica se o produto tem estoque, é ilimitado, ou é manual
+                    estoque_valido = p.get("purchasable", True) and (p.get("stock", 0) > 0 or p.get("infinite_stock", False) or p.get("delivery_mode") == "manual")
+                    if estoque_valido:
+                        custo_usd = float(p.get("price", 0))
+                        
+                        preco_calculado = calcular_preco_dinamico(custo_usd)
+                        raw_name = p.get("name", p.get("product_name", ""))
+                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(raw_name)
+                        
+                        if nome_ptbr not in produtos_processados:
+                            catalogo_tratado.append({
+                                "id": str(p.get("product_id")),
+                                "nome": nome_ptbr,
+                                "precoBase": preco_calculado,
+                                "logoDomain": obter_dominio_logo(nome_ptbr),
+                                "categoria": obter_categoria(nome_ptbr),
+                                "estoque": True,
+                                "descricao": resumo_ptbr
+                            })
+                            produtos_processados.add(nome_ptbr)
+        except Exception as e: print(f"Erro Optimus: {e}")
 
     return json.dumps(catalogo_tratado)
 
@@ -264,12 +341,34 @@ def gerar_pix():
                         break
         except: pass
 
+    if BUNAI_API_KEY and custo_usd is None:
+        try:
+            resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=100", headers={"X-API-Key": BUNAI_API_KEY}, timeout=10)
+            if resp_bunai.status_code == 200:
+                for p in resp_bunai.json():
+                    if str(p.get("product_id")) == produto_id:
+                        custo_usd = float(p.get("price", 0))
+                        nome_original = p.get("display_name", "")
+                        break
+        except: pass
+
+    if OPTIMUS_API_KEY and custo_usd is None:
+        try:
+            resp_optimus = requests.get("https://optimusprime.click/api/telegram-buyer/products", headers={"X-API-Key": OPTIMUS_API_KEY}, timeout=10)
+            if resp_optimus.status_code == 200:
+                data_optimus = resp_optimus.json()
+                prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
+                for p in prod_list:
+                    if str(p.get("product_id")) == produto_id:
+                        custo_usd = float(p.get("price", 0))
+                        nome_original = p.get("name", p.get("product_name", ""))
+                        break
+        except: pass
+
     if custo_usd is None:
         return {"error": "Produto indisponível no estoque dos fornecedores."}
 
-    # 💵 USA A NOVA FÓRMULA DE LUCRO NA HORA DE COBRAR O PIX
     preco_base = calcular_preco_dinamico(custo_usd)
-    
     preco_unitario = preco_base * (70.00 / 85.00) if quantidade >= 5 else preco_base
     valor_total_seguro = round(preco_unitario * quantidade, 2)
     
