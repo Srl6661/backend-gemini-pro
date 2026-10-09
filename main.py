@@ -31,6 +31,15 @@ def enable_cors():
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
+# 🛡️ FUNÇÕES DE SEGURANÇA (Evitam que o servidor engasgue com dados "Nulos")
+def safe_float(val, default=0.0):
+    try: return float(val) if val is not None else default
+    except: return default
+
+def safe_int(val, default=0):
+    try: return int(val) if val is not None else default
+    except: return default
+
 def gerar_codigo_pedido(payment_id):
     assinatura = hmac.new(SECRET_KEY.encode(), str(payment_id).encode(), hashlib.sha256).hexdigest()[:8].upper()
     return f"GP-{assinatura}"
@@ -78,6 +87,7 @@ def obter_dominio_logo(nome_produto):
     if 'leonardo' in nome: return 'leonardo.ai'
     if 'adobe' in nome: return 'adobe.com'
     if 'higgsfield' in nome: return 'higgsfield.ai'
+    if 'crunchyroll' in nome: return 'crunchyroll.com'
     return 'tech.com' 
 
 def obter_categoria(nome_produto):
@@ -96,14 +106,14 @@ def obter_categoria(nome_produto):
         return 'Educação & Idiomas'
     if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog', 'notion', 'airtable', 'microsoft']): 
         return 'Produtividade'
-    if 'youtube' in nome: return 'Entretenimento'
+    if any(x in nome for x in ['youtube', 'crunchyroll']): 
+        return 'Entretenimento'
     return 'Licença Premium'
 
 def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
     nome_base = re.sub(r'(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D|\(NW\)|\(FW\))', '', nome_base, flags=re.IGNORECASE).strip()
     
-    # 🧠 NOVOS FILTROS INTELIGENTES PARA MESES E ANOS
     nome_base = re.sub(r'\b1\s*Year\b', '12 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b12\s*M\b', '12 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b6\s*M\b', '6 meses', nome_base, flags=re.IGNORECASE)
@@ -125,7 +135,6 @@ def traduzir_e_resumir(nome_original):
     elif match_meses: 
         sufixo_tempo = f" ({match_meses.group(1)} meses)"
     else:
-        # FALLBACK: Se não achar tempo nenhum e não for pacote vitalício/créditos, assume 30 dias
         if not any(x in nome_lower for x in ['credit', 'crédito', 'lifetime', 'vitalício']):
             sufixo_tempo = " (30 dias)"
     
@@ -171,6 +180,7 @@ def traduzir_e_resumir(nome_original):
     if 'leonardo' in nome_lower: return f"Leonardo AI Premium{sufixo_tempo}", "Geração de imagens incríveis e artes digitais usando modelos de IA de ponta."
     if 'adobe express' in nome_lower: return f"Adobe Express Premium{sufixo_tempo}", "Crie posts sociais, vídeos curtos, flyers e logos em minutos com IA generativa da Adobe."
     if 'higgsfield' in nome_lower: return f"Higgsfield Pro{sufixo_tempo}", "Plataforma de criação de vídeos cinemáticos e comerciais por Inteligência Artificial."
+    if 'crunchyroll' in nome_lower: return f"Crunchyroll Mega Fan{sufixo_tempo}", "Assista aos melhores animes do mundo sem anúncios e com episódios liberados logo após o Japão."
 
     return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
 
@@ -199,83 +209,93 @@ def get_catalogo():
     catalogo_tratado = []
     produtos_processados = set() 
     
+    # 1. MOTOR GGSOMA
     if PARTNER_API_KEY:
         try:
             headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
             resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers, timeout=10)
             if resp_gg.status_code == 200:
                 for p in resp_gg.json().get("data", []):
-                    if p.get("stock", {}).get("inStock", False):
-                        custo_usd = float(p.get("yourPrice", 0))
-                        preco_calculado = calcular_preco_dinamico(custo_usd)
-                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
-                        
-                        if nome_ptbr not in produtos_processados:
-                            catalogo_tratado.append({
-                                "id": p["slug"],
-                                "nome": nome_ptbr,
-                                "precoBase": preco_calculado,
-                                "logoDomain": obter_dominio_logo(nome_ptbr),
-                                "categoria": obter_categoria(nome_ptbr),
-                                "estoque": True,
-                                "descricao": resumo_ptbr
-                            })
-                            produtos_processados.add(nome_ptbr)
+                    try:
+                        if p.get("stock", {}).get("inStock", False):
+                            custo_usd = safe_float(p.get("yourPrice"))
+                            preco_calculado = calcular_preco_dinamico(custo_usd)
+                            nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                            
+                            if nome_ptbr not in produtos_processados:
+                                catalogo_tratado.append({
+                                    "id": p["slug"],
+                                    "nome": nome_ptbr,
+                                    "precoBase": preco_calculado,
+                                    "logoDomain": obter_dominio_logo(nome_ptbr),
+                                    "categoria": obter_categoria(nome_ptbr),
+                                    "estoque": True,
+                                    "descricao": resumo_ptbr
+                                })
+                                produtos_processados.add(nome_ptbr)
+                    except: pass
         except Exception as e: print(f"Erro GGSoma: {e}")
 
+    # 2. MOTOR CANBOSO
     if CANBOSO_API_KEY:
         try:
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
             if resp_canboso.status_code == 200:
                 for p in resp_canboso.json().get("products", []):
-                    estoque = p.get("availability", {}).get("available")
-                    if estoque is None or estoque != 0: 
-                        moeda = p.get("price", {}).get("currency", "USD")
-                        valor_bruto = float(p.get("price", {}).get("amount", 0))
-                        custo_usd = valor_bruto / 25000.0 if moeda == "VND" else valor_bruto
-                        
-                        preco_calculado = calcular_preco_dinamico(custo_usd)
-                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
-                        
-                        if nome_ptbr not in produtos_processados:
-                            catalogo_tratado.append({
-                                "id": str(p["productId"]),
-                                "nome": nome_ptbr,
-                                "precoBase": preco_calculado,
-                                "logoDomain": obter_dominio_logo(nome_ptbr),
-                                "categoria": obter_categoria(nome_ptbr),
-                                "estoque": True,
-                                "descricao": resumo_ptbr
-                            })
-                            produtos_processados.add(nome_ptbr)
+                    try:
+                        estoque = p.get("availability", {}).get("available")
+                        if estoque is None or str(estoque) != "0": 
+                            moeda = p.get("price", {}).get("currency", "USD")
+                            valor_bruto = safe_float(p.get("price", {}).get("amount"))
+                            custo_usd = valor_bruto / 25000.0 if moeda == "VND" else valor_bruto
+                            
+                            preco_calculado = calcular_preco_dinamico(custo_usd)
+                            nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("name", ""))
+                            
+                            if nome_ptbr not in produtos_processados:
+                                catalogo_tratado.append({
+                                    "id": str(p["productId"]),
+                                    "nome": nome_ptbr,
+                                    "precoBase": preco_calculado,
+                                    "logoDomain": obter_dominio_logo(nome_ptbr),
+                                    "categoria": obter_categoria(nome_ptbr),
+                                    "estoque": True,
+                                    "descricao": resumo_ptbr
+                                })
+                                produtos_processados.add(nome_ptbr)
+                    except: pass
         except Exception as e: print(f"Erro Canboso: {e}")
 
+    # 3. MOTOR BUNAI STORE
     if BUNAI_API_KEY:
         try:
             headers_bunai = {"X-API-Key": BUNAI_API_KEY}
             resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=100", headers=headers_bunai, timeout=10)
             if resp_bunai.status_code == 200:
                 for p in resp_bunai.json():
-                    estoque_valido = p.get("infinite_stock", False) or p.get("stock_count", 0) > 0
-                    if estoque_valido:
-                        custo_usd = float(p.get("price", 0))
-                        
-                        preco_calculado = calcular_preco_dinamico(custo_usd)
-                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("display_name", ""))
-                        
-                        if nome_ptbr not in produtos_processados:
-                            catalogo_tratado.append({
-                                "id": str(p["product_id"]),
-                                "nome": nome_ptbr,
-                                "precoBase": preco_calculado,
-                                "logoDomain": obter_dominio_logo(nome_ptbr),
-                                "categoria": obter_categoria(nome_ptbr),
-                                "estoque": True,
-                                "descricao": resumo_ptbr
-                            })
-                            produtos_processados.add(nome_ptbr)
+                    try:
+                        estoque_valido = p.get("infinite_stock", False) or safe_int(p.get("stock_count")) > 0
+                        if estoque_valido:
+                            custo_usd = safe_float(p.get("price"))
+                            
+                            preco_calculado = calcular_preco_dinamico(custo_usd)
+                            nome_ptbr, resumo_ptbr = traduzir_e_resumir(p.get("display_name", ""))
+                            
+                            if nome_ptbr not in produtos_processados:
+                                catalogo_tratado.append({
+                                    "id": str(p["product_id"]),
+                                    "nome": nome_ptbr,
+                                    "precoBase": preco_calculado,
+                                    "logoDomain": obter_dominio_logo(nome_ptbr),
+                                    "categoria": obter_categoria(nome_ptbr),
+                                    "estoque": True,
+                                    "descricao": resumo_ptbr
+                                })
+                                produtos_processados.add(nome_ptbr)
+                    except: pass
         except Exception as e: print(f"Erro Bunai: {e}")
 
+    # 4. MOTOR OPTIMUS PRIME
     if OPTIMUS_API_KEY:
         try:
             headers_optimus = {"X-API-Key": OPTIMUS_API_KEY}
@@ -284,25 +304,27 @@ def get_catalogo():
                 data_optimus = resp_optimus.json()
                 prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
                 for p in prod_list:
-                    estoque_valido = p.get("purchasable", True) and (p.get("stock", 0) > 0 or p.get("infinite_stock", False) or p.get("delivery_mode") == "manual")
-                    if estoque_valido:
-                        custo_usd = float(p.get("price", 0))
-                        
-                        preco_calculado = calcular_preco_dinamico(custo_usd)
-                        raw_name = p.get("name", p.get("product_name", ""))
-                        nome_ptbr, resumo_ptbr = traduzir_e_resumir(raw_name)
-                        
-                        if nome_ptbr not in produtos_processados:
-                            catalogo_tratado.append({
-                                "id": str(p.get("product_id")),
-                                "nome": nome_ptbr,
-                                "precoBase": preco_calculado,
-                                "logoDomain": obter_dominio_logo(nome_ptbr),
-                                "categoria": obter_categoria(nome_ptbr),
-                                "estoque": True,
-                                "descricao": resumo_ptbr
-                            })
-                            produtos_processados.add(nome_ptbr)
+                    try:
+                        estoque_valido = p.get("purchasable", True) and (safe_int(p.get("stock")) > 0 or p.get("infinite_stock", False) or p.get("delivery_mode") == "manual")
+                        if estoque_valido:
+                            custo_usd = safe_float(p.get("price") or p.get("pricing") or p.get("walletPricing") or 0)
+                            
+                            preco_calculado = calcular_preco_dinamico(custo_usd)
+                            raw_name = p.get("name") or p.get("product_name") or ""
+                            nome_ptbr, resumo_ptbr = traduzir_e_resumir(raw_name)
+                            
+                            if nome_ptbr not in produtos_processados:
+                                catalogo_tratado.append({
+                                    "id": str(p.get("product_id")),
+                                    "nome": nome_ptbr,
+                                    "precoBase": preco_calculado,
+                                    "logoDomain": obter_dominio_logo(nome_ptbr),
+                                    "categoria": obter_categoria(nome_ptbr),
+                                    "estoque": True,
+                                    "descricao": resumo_ptbr
+                                })
+                                produtos_processados.add(nome_ptbr)
+                    except: pass
         except Exception as e: print(f"Erro Optimus: {e}")
 
     return json.dumps(catalogo_tratado)
@@ -329,10 +351,12 @@ def gerar_pix():
             resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers={"Authorization": f"Bearer {PARTNER_API_KEY}"}, timeout=10)
             if resp_gg.status_code == 200:
                 for p in resp_gg.json().get("data", []):
-                    if p.get("slug") == produto_id:
-                        custo_usd = float(p.get("yourPrice", 0))
-                        nome_original = p.get("name", "")
-                        break
+                    try:
+                        if p.get("slug") == produto_id:
+                            custo_usd = safe_float(p.get("yourPrice"))
+                            nome_original = p.get("name", "")
+                            break
+                    except: pass
         except: pass
 
     if CANBOSO_API_KEY and custo_usd is None:
@@ -340,12 +364,14 @@ def gerar_pix():
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
             if resp_canboso.status_code == 200:
                 for p in resp_canboso.json().get("products", []):
-                    if str(p.get("productId")) == produto_id:
-                        moeda = p.get("price", {}).get("currency", "USD")
-                        valor = float(p.get("price", {}).get("amount", 0))
-                        custo_usd = valor / 25000.0 if moeda == "VND" else valor
-                        nome_original = p.get("name", "")
-                        break
+                    try:
+                        if str(p.get("productId")) == produto_id:
+                            moeda = p.get("price", {}).get("currency", "USD")
+                            valor = safe_float(p.get("price", {}).get("amount"))
+                            custo_usd = valor / 25000.0 if moeda == "VND" else valor
+                            nome_original = p.get("name", "")
+                            break
+                    except: pass
         except: pass
 
     if BUNAI_API_KEY and custo_usd is None:
@@ -353,10 +379,12 @@ def gerar_pix():
             resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=100", headers={"X-API-Key": BUNAI_API_KEY}, timeout=10)
             if resp_bunai.status_code == 200:
                 for p in resp_bunai.json():
-                    if str(p.get("product_id")) == produto_id:
-                        custo_usd = float(p.get("price", 0))
-                        nome_original = p.get("display_name", "")
-                        break
+                    try:
+                        if str(p.get("product_id")) == produto_id:
+                            custo_usd = safe_float(p.get("price"))
+                            nome_original = p.get("display_name", "")
+                            break
+                    except: pass
         except: pass
 
     if OPTIMUS_API_KEY and custo_usd is None:
@@ -366,10 +394,12 @@ def gerar_pix():
                 data_optimus = resp_optimus.json()
                 prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
                 for p in prod_list:
-                    if str(p.get("product_id")) == produto_id:
-                        custo_usd = float(p.get("price", 0))
-                        nome_original = p.get("name", p.get("product_name", ""))
-                        break
+                    try:
+                        if str(p.get("product_id")) == produto_id:
+                            custo_usd = safe_float(p.get("price") or p.get("pricing") or p.get("walletPricing") or 0)
+                            nome_original = p.get("name") or p.get("product_name") or ""
+                            break
+                    except: pass
         except: pass
 
     if custo_usd is None:
