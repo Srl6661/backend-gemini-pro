@@ -15,7 +15,7 @@ ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 PARTNER_API_KEY = os.environ.get('PARTNER_API_KEY') 
 CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY') 
 BUNAI_API_KEY = os.environ.get('BUNAI_API_KEY')     
-OPTIMUS_API_KEY = os.environ.get('OPTIMUS_API_KEY') # Optimus Prime
+OPTIMUS_API_KEY = os.environ.get('OPTIMUS_API_KEY') 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-secreta-padrao-123')
 
 PARTNER_API_URL = "https://ggsoma.store/api/partner/v1"
@@ -102,10 +102,12 @@ def obter_categoria(nome_produto):
 def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
     nome_base = re.sub(r'(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D|\(NW\)|\(FW\))', '', nome_base, flags=re.IGNORECASE).strip()
-    nome_base = re.sub(r'\b1\s*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
-    nome_base = re.sub(r'\b1\s*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
-    nome_base = re.sub(r'(\d+)\s*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
-    nome_base = re.sub(r'(\d+)\s*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
+    
+    # Filtro robusto para capturar os meses (com ou sem hífen)
+    nome_base = re.sub(r'\b1[-\s]*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b1[-\s]*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'(\d+)[-\s]*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'(\d+)[-\s]*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'>', '-', nome_base)
     
     match_dias = re.search(r'(30\s*dias)', nome_base, re.IGNORECASE)
@@ -147,14 +149,14 @@ def traduzir_e_resumir(nome_original):
     if 'proton' in nome_lower: return f"Proton Unlimited{sufixo_tempo}", "E-mail criptografado, calendário, drive e VPN em um ecossistema com privacidade máxima."
     if 'capcut' in nome_lower: return f"CapCut Premium{sufixo_tempo}", "Acesse todos os efeitos Pro, remova fundos facilmente e edite vídeos como um profissional."
     if 'grok' in nome_lower: return f"Grok AI (xAI){sufixo_tempo}", "Acesso ao poderoso modelo de Inteligência Artificial sem filtros desenvolvido pela xAI (Twitter/X)."
-    if 'coursera' in nome_lower: return f"Coursera Premium", "Acesso ilimitado a milhares de cursos, projetos guiados e certificados nas melhores universidades."
+    if 'coursera' in nome_lower: return f"Coursera Premium{sufixo_tempo}", "Acesso ilimitado a milhares de cursos, projetos guiados e certificados nas melhores universidades."
     if 'youtube' in nome_lower: return f"YouTube Premium{sufixo_tempo}", "Assista a vídeos sem anúncios, baixe para ver offline e aproveite o YouTube Music Premium."
     if 'cursor' in nome_lower: return f"Cursor Pro{sufixo_tempo}", "O editor de código revolucionário impulsionado por IA que escreve software junto com você."
     if 'notion' in nome_lower: return f"Notion Business{sufixo_tempo}", "O espaço de trabalho definitivo. Notas, wikis e gerenciamento de projetos com IA integrada."
     if 'arize' in nome_lower: return f"Arize Pro{sufixo_tempo}", "Plataforma avançada de observabilidade e avaliação de modelos de Inteligência Artificial."
     if 'airtable' in nome_lower: return f"Airtable Team{sufixo_tempo}", "Crie aplicativos poderosos para o seu negócio conectando seus dados de forma visual."
     if 'descript' in nome_lower: return f"Descript Creator{sufixo_tempo}", "A maneira mais fácil e rápida de gravar, transcrever e editar vídeos e podcasts."
-    if 'microsoft 365' in nome_lower: return f"Microsoft 365 Premium", "O pacote Office completo com Word, Excel, PowerPoint e armazenamento em nuvem seguro."
+    if 'microsoft 365' in nome_lower: return f"Microsoft 365 Premium{sufixo_tempo}", "O pacote Office completo com Word, Excel, PowerPoint e armazenamento em nuvem seguro."
     if 'wispr' in nome_lower: return f"Wispr Flow Pro{sufixo_tempo}", "Ditado por voz revolucionário. Fale e deixe a IA formatar e escrever por você no Mac ou Windows."
     if 'leonardo' in nome_lower: return f"Leonardo AI Premium{sufixo_tempo}", "Geração de imagens incríveis e artes digitais usando modelos de IA de ponta."
     if 'adobe express' in nome_lower: return f"Adobe Express Premium{sufixo_tempo}", "Crie posts sociais, vídeos curtos, flyers e logos em minutos com IA generativa da Adobe."
@@ -187,7 +189,6 @@ def get_catalogo():
     catalogo_tratado = []
     produtos_processados = set() 
     
-    # 1. MOTOR GGSOMA
     if PARTNER_API_KEY:
         try:
             headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
@@ -212,7 +213,6 @@ def get_catalogo():
                             produtos_processados.add(nome_ptbr)
         except Exception as e: print(f"Erro GGSoma: {e}")
 
-    # 2. MOTOR CANBOSO
     if CANBOSO_API_KEY:
         try:
             resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
@@ -240,7 +240,6 @@ def get_catalogo():
                             produtos_processados.add(nome_ptbr)
         except Exception as e: print(f"Erro Canboso: {e}")
 
-    # 3. MOTOR BUNAI STORE
     if BUNAI_API_KEY:
         try:
             headers_bunai = {"X-API-Key": BUNAI_API_KEY}
@@ -267,7 +266,6 @@ def get_catalogo():
                             produtos_processados.add(nome_ptbr)
         except Exception as e: print(f"Erro Bunai: {e}")
 
-    # 4. MOTOR OPTIMUS PRIME
     if OPTIMUS_API_KEY:
         try:
             headers_optimus = {"X-API-Key": OPTIMUS_API_KEY}
@@ -276,7 +274,6 @@ def get_catalogo():
                 data_optimus = resp_optimus.json()
                 prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
                 for p in prod_list:
-                    # Verifica se o produto tem estoque, é ilimitado, ou é manual
                     estoque_valido = p.get("purchasable", True) and (p.get("stock", 0) > 0 or p.get("infinite_stock", False) or p.get("delivery_mode") == "manual")
                     if estoque_valido:
                         custo_usd = float(p.get("price", 0))
