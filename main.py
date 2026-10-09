@@ -103,21 +103,31 @@ def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
     nome_base = re.sub(r'(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D|\(NW\)|\(FW\))', '', nome_base, flags=re.IGNORECASE).strip()
     
-    # Filtro robusto para capturar os meses (com ou sem hífen)
+    # 🧠 NOVOS FILTROS INTELIGENTES PARA MESES E ANOS
+    nome_base = re.sub(r'\b1\s*Year\b', '12 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b12\s*M\b', '12 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b6\s*M\b', '6 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b3\s*M\b', '3 meses', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b1\s*M\b', '30 dias', nome_base, flags=re.IGNORECASE)
+    
     nome_base = re.sub(r'\b1[-\s]*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
-    nome_base = re.sub(r'\b1[-\s]*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\d+)[-\s]*months?', r'\1 meses', nome_base, flags=re.IGNORECASE)
-    nome_base = re.sub(r'(\d+)[-\s]*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'>', '-', nome_base)
     
     match_dias = re.search(r'(30\s*dias)', nome_base, re.IGNORECASE)
     match_meses = re.search(r'(\d+)\s*meses', nome_base, re.IGNORECASE)
     
-    sufixo_tempo = ""
-    if match_dias: sufixo_tempo = " (30 dias)"
-    elif match_meses: sufixo_tempo = f" ({match_meses.group(1)} meses)"
-    
     nome_lower = nome_base.lower()
+    
+    sufixo_tempo = ""
+    if match_dias: 
+        sufixo_tempo = " (30 dias)"
+    elif match_meses: 
+        sufixo_tempo = f" ({match_meses.group(1)} meses)"
+    else:
+        # FALLBACK: Se não achar tempo nenhum e não for pacote vitalício/créditos, assume 30 dias
+        if not any(x in nome_lower for x in ['credit', 'crédito', 'lifetime', 'vitalício']):
+            sufixo_tempo = " (30 dias)"
     
     if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Pacote completo: Gemini Advanced, Veo, Meet/Agenda Premium e nuvem ampliada. BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
     if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial para desenvolvedores. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
