@@ -55,13 +55,12 @@ def obter_dominio_logo(nome_produto):
     if 'jam' in nome: return 'jam.dev'
     if 'linear' in nome: return 'linear.app'
     if 'gumloop' in nome: return 'gumloop.com'
-    if 'elevenlabs' in nome: return 'elevenlabs.io'
+    if 'elevenlabs' in nome or 'eleven' in nome: return 'elevenlabs.io'
     if 'supabase' in nome: return 'supabase.com'
     if 'replit' in nome: return 'replit.com'
     if 'granola' in nome: return 'granola.so'
     if 'railway' in nome: return 'railway.app'
     if 'posthog' in nome: return 'posthog.com'
-    if 'mobbin' in nome: return 'mobbin.com'
     if 'runway' in nome: return 'runwayml.com'
     if 'chatprd' in nome: return 'chatprd.ai'
     if 'proton' in nome: return 'proton.me'
@@ -72,7 +71,6 @@ def obter_dominio_logo(nome_produto):
     if 'duolingo' in nome: return 'duolingo.com'
     if 'bolt' in nome: return 'bolt.new'
     if 'canva' in nome: return 'canva.com'
-    if 'google' in nome or 'gemini' in nome: return 'google.com'
     if 'capcut' in nome: return 'capcut.com'
     if 'grok' in nome: return 'x.ai'
     if 'coursera' in nome: return 'coursera.org'
@@ -82,31 +80,48 @@ def obter_dominio_logo(nome_produto):
     if 'arize' in nome: return 'arize.com'
     if 'airtable' in nome: return 'airtable.com'
     if 'descript' in nome: return 'descript.com'
-    if 'microsoft' in nome: return 'microsoft.com'
     if 'wispr' in nome: return 'wisprflow.ai'
     if 'leonardo' in nome: return 'leonardo.ai'
     if 'adobe' in nome: return 'adobe.com'
     if 'higgsfield' in nome: return 'higgsfield.ai'
     if 'crunchyroll' in nome: return 'crunchyroll.com'
+    if 'mobbin' in nome: return 'mobbin.com'
+    if 'microsoft' in nome or 'ms office' in nome or 'windows' in nome: return 'microsoft.com'
+    if 'gmail' in nome or 'google' in nome or 'gemini' in nome: return 'google.com'
+    if 'manus' in nome: return 'manus.com'
+    if 'warp' in nome: return 'warp.dev'
+    if 'memrise' in nome: return 'memrise.com'
+    if 'resend' in nome: return 'resend.com'
+    if 'supercut' in nome: return 'supercut.ai'
+    if 'intercom' in nome: return 'intercom.com'
+    if 'kaspersky' in nome: return 'kaspersky.com'
+    if 'discord' in nome: return 'discord.com'
+    if 'grammarly' in nome: return 'grammarly.com'
+    if 'kahoot' in nome: return 'kahoot.com'
+    if 'roblox' in nome: return 'roblox.com'
+    if 'spotify' in nome: return 'spotify.com'
+    if 'zoom' in nome: return 'zoom.us'
+    if 'autodesk' in nome: return 'autodesk.com'
+    if 'ilovepdf' in nome: return 'ilovepdf.com'
     return 'tech.com' 
 
 def obter_categoria(nome_produto):
     nome = nome_produto.lower()
-    if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus', 'grok', 'cursor', 'wispr']): 
+    if any(x in nome for x in ['chatgpt', 'gemini', 'google pro', 'google ai', 'chatprd', 'manus', 'grok', 'cursor', 'wispr', 'magic', 'supercut', 'pangram']): 
         return 'Inteligência Artificial'
-    if any(x in nome for x in ['canva', 'framer', 'runway', 'magic patterns', 'elevenlabs', 'mobbin', 'capcut', 'descript', 'leonardo', 'adobe', 'higgsfield']): 
+    if any(x in nome for x in ['canva', 'framer', 'runway', 'magic patterns', 'elevenlabs', 'eleven', 'mobbin', 'capcut', 'descript', 'leonardo', 'adobe', 'higgsfield', 'autodesk', 'jam']): 
         return 'Design & Criatividade'
-    if any(x in nome for x in ['supabase', 'replit', 'railway', 'bolt', 'lovable', 'arize']): 
+    if any(x in nome for x in ['supabase', 'replit', 'railway', 'bolt', 'lovable', 'arize', 'warp', 'resend', 'api credits']): 
         return 'Desenvolvimento'
     if any(x in nome for x in ['n8n', 'gumloop']): 
         return 'Automação'
-    if any(x in nome for x in ['telegram', 'linkedin', 'proton', 'nord', 'vpn']): 
+    if any(x in nome for x in ['telegram', 'linkedin', 'proton', 'nord', 'vpn', 'kaspersky', 'windows']): 
         return 'Redes & Segurança'
-    if any(x in nome for x in ['duolingo', 'quillbot', 'coursera']): 
+    if any(x in nome for x in ['duolingo', 'quillbot', 'coursera', 'memrise', 'grammarly', 'kahoot']): 
         return 'Educação & Idiomas'
-    if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog', 'notion', 'airtable', 'microsoft']): 
+    if any(x in nome for x in ['gamma', 'jam', 'linear', 'posthog', 'notion', 'airtable', 'microsoft', 'ms office', 'gmail', 'intercom', 'ilovepdf', 'zoom']): 
         return 'Produtividade'
-    if any(x in nome for x in ['youtube', 'crunchyroll']): 
+    if any(x in nome for x in ['youtube', 'crunchyroll', 'discord', 'roblox', 'spotify']): 
         return 'Entretenimento'
     return 'Licença Premium'
 
@@ -114,6 +129,7 @@ def traduzir_e_resumir(nome_original):
     nome_base = str(nome_original).replace("None", "").strip()
     nome_base = re.sub(r'(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D|\(NW\)|\(FW\))', '', nome_base, flags=re.IGNORECASE).strip()
     
+    # 🧠 FILTROS INTELIGENTES DE TEMPO
     nome_base = re.sub(r'\b1\s*Year\b', '12 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b12\s*M\b', '12 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b6\s*M\b', '6 meses', nome_base, flags=re.IGNORECASE)
@@ -138,18 +154,19 @@ def traduzir_e_resumir(nome_original):
         if not any(x in nome_lower for x in ['credit', 'crédito', 'lifetime', 'vitalício']):
             sufixo_tempo = " (30 dias)"
     
-    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Pacote completo: Gemini Advanced, Veo, Meet/Agenda Premium e nuvem ampliada. BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
-    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso completo à plataforma de Inteligência Artificial para desenvolvedores. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
+    # 🌟 TEXTOS DESCRITIVOS (Originais + Novos Mapeados)
+    if 'gemini' in nome_lower: return f"Google Pro{sufixo_tempo}", "Pacote completo: Gemini Advanced, Veo, Meet Premium. BÔNUS: YouTube Premium. 🛡️ GARANTIA: 20 dias (conta Google)."
+    if 'google ai' in nome_lower: return f"Google AI Pro{sufixo_tempo}", "Acesso à plataforma de Inteligência Artificial para desenvolvedores. 🛡️ GARANTIA: 20 dias (conta Google)."
     if 'chatgpt' in nome_lower: return f"ChatGPT Plus{sufixo_tempo}", "Acesso ao GPT-4. Inteligência artificial avançada para textos, códigos, análises e criação de imagens."
     if 'framer' in nome_lower: return f"Framer Pro{sufixo_tempo}", "Crie e publique sites profissionais, rápidos e com animações incríveis sem precisar escrever código."
     if 'canva' in nome_lower: return f"Canva Pro{sufixo_tempo}", "Crie designs profissionais, apresentações e vídeos com acesso ilimitado a imagens e templates premium."
     if 'gamma' in nome_lower: return f"Gamma Pro{sufixo_tempo}", "Gere apresentações, documentos e sites inteiros em segundos utilizando o poder da Inteligência Artificial."
-    if 'elevenlabs' in nome_lower: return f"ElevenLabs Creator{sufixo_tempo}", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
+    if 'elevenlabs' in nome_lower or 'eleven' in nome_lower: return f"ElevenLabs Creator{sufixo_tempo}", "O melhor gerador de vozes do mundo. Crie dublagens e narrações ultra-realistas com Inteligência Artificial."
     if 'runway' in nome_lower: return f"Runway Pro{sufixo_tempo}", "Geração e edição de vídeos impressionantes a partir de textos e imagens utilizando IA cinematográfica."
     if 'telegram' in nome_lower: return f"Telegram Premium{sufixo_tempo}", "Destaque seu perfil, faça downloads mais rápidos, transcrição de áudios e ganhe limites dobrados."
     if 'linkedin' in nome_lower: return f"LinkedIn Premium{sufixo_tempo}", "Destaque-se para recrutadores, veja quem visitou seu perfil e expanda sua rede profissional."
     if 'duolingo' in nome_lower: return f"Duolingo Super{sufixo_tempo}", "Aprenda novos idiomas sem anúncios, com vidas ilimitadas e lições offline no seu ritmo."
-    if 'nord' in nome_lower or 'vpn' in nome_lower: return f"NordVPN Premium{sufixo_tempo}", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
+    if 'nord' in nome_lower or 'vpn' in nome_lower: return f"VPN Premium{sufixo_tempo}", "Navegação totalmente anônima, segura e sem bloqueios geográficos na internet."
     if 'replit' in nome_lower: return f"Replit Core{sufixo_tempo}", "Ambiente de desenvolvimento na nuvem com IA integrada para você programar direto do navegador."
     if 'supabase' in nome_lower: return f"Supabase Pro{sufixo_tempo}", "Banco de dados e autenticação escalável para desenvolvedores. A melhor alternativa ao Firebase."
     if 'n8n' in nome_lower: return f"n8n Starter{sufixo_tempo}", "Automatize tarefas repetitivas e integre centenas de aplicativos de forma simples e visual."
@@ -175,12 +192,28 @@ def traduzir_e_resumir(nome_original):
     if 'arize' in nome_lower: return f"Arize Pro{sufixo_tempo}", "Plataforma avançada de observabilidade e avaliação de modelos de Inteligência Artificial."
     if 'airtable' in nome_lower: return f"Airtable Team{sufixo_tempo}", "Crie aplicativos poderosos para o seu negócio conectando seus dados de forma visual."
     if 'descript' in nome_lower: return f"Descript Creator{sufixo_tempo}", "A maneira mais fácil e rápida de gravar, transcrever e editar vídeos e podcasts."
-    if 'microsoft 365' in nome_lower: return f"Microsoft 365 Premium{sufixo_tempo}", "O pacote Office completo com Word, Excel, PowerPoint e armazenamento em nuvem seguro."
+    if 'ms office' in nome_lower or 'microsoft' in nome_lower: return f"Microsoft 365 Premium{sufixo_tempo}", "O pacote Office completo com Word, Excel, PowerPoint e armazenamento em nuvem seguro."
     if 'wispr' in nome_lower: return f"Wispr Flow Pro{sufixo_tempo}", "Ditado por voz revolucionário. Fale e deixe a IA formatar e escrever por você no Mac ou Windows."
     if 'leonardo' in nome_lower: return f"Leonardo AI Premium{sufixo_tempo}", "Geração de imagens incríveis e artes digitais usando modelos de IA de ponta."
-    if 'adobe express' in nome_lower: return f"Adobe Express Premium{sufixo_tempo}", "Crie posts sociais, vídeos curtos, flyers e logos em minutos com IA generativa da Adobe."
+    if 'adobe' in nome_lower: return f"Adobe Express Premium{sufixo_tempo}", "Crie posts sociais, vídeos curtos, flyers e logos em minutos com IA generativa da Adobe."
     if 'higgsfield' in nome_lower: return f"Higgsfield Pro{sufixo_tempo}", "Plataforma de criação de vídeos cinemáticos e comerciais por Inteligência Artificial."
     if 'crunchyroll' in nome_lower: return f"Crunchyroll Mega Fan{sufixo_tempo}", "Assista aos melhores animes do mundo sem anúncios e com episódios liberados logo após o Japão."
+    if 'spotify' in nome_lower: return f"Spotify Premium{sufixo_tempo}", "Música sem limites. Ouça suas músicas e podcasts favoritos sem anúncios e offline."
+    if 'roblox' in nome_lower: return f"Roblox Premium{sufixo_tempo}", "Eleve sua experiência no Roblox com benefícios exclusivos e moedas do jogo."
+    if 'discord' in nome_lower: return f"Discord Nitro{sufixo_tempo}", "Melhore seu servidor, ganhe emojis personalizados, avatares animados e uploads maiores."
+    if 'grammarly' in nome_lower: return f"Grammarly Premium{sufixo_tempo}", "Escreva com confiança. Corretor gramatical e assistente de redação inteligente."
+    if 'kaspersky' in nome_lower: return f"Kaspersky Premium{sufixo_tempo}", "Proteção total contra vírus, malware e ameaças online para seus dispositivos."
+    if 'kahoot' in nome_lower: return f"Kahoot! Premium{sufixo_tempo}", "Crie, jogue e compartilhe jogos de aprendizado interativos para todas as idades."
+    if 'autodesk' in nome_lower: return f"Autodesk Premium{sufixo_tempo}", "Softwares líderes para design 3D, engenharia e entretenimento (AutoCAD, Maya, etc)."
+    if 'ilovepdf' in nome_lower: return f"iLovePDF Premium{sufixo_tempo}", "Ferramentas completas para editar, converter, mesclar e dividir arquivos PDF facilmente."
+    if 'zoom' in nome_lower: return f"Zoom Premium{sufixo_tempo}", "Reuniões sem limite de tempo, gravações na nuvem e recursos premium de colaboração."
+    if 'intercom' in nome_lower: return f"Intercom Premium{sufixo_tempo}", "Plataforma completa de atendimento ao cliente, automação e suporte."
+    if 'windows' in nome_lower: return f"Windows Ativação{sufixo_tempo}", "Chave de ativação original do Windows. Mais segurança e desempenho para seu PC."
+    if 'memrise' in nome_lower: return f"Memrise Pro{sufixo_tempo}", "Aprenda novos idiomas rapidamente com vídeos de nativos e técnicas comprovadas."
+    if 'resend' in nome_lower: return f"Resend API{sufixo_tempo}", "API de email para desenvolvedores. Envie emails transacionais de forma simples e rápida."
+    if 'warp' in nome_lower: return f"Warp Terminal{sufixo_tempo}", "O terminal reimaginado. Rápido, moderno e com Inteligência Artificial integrada."
+    if 'supercut' in nome_lower: return f"Supercut AI{sufixo_tempo}", "Edição de vídeo simplificada com ferramentas avançadas para criadores de conteúdo."
+    if 'gmail' in nome_lower: return f"Contas Gmail Seguras{sufixo_tempo}", "Contas Gmail envelhecidas (aged) e seguras para suas necessidades de negócios e marketing digital."
 
     return f"{nome_base}{sufixo_tempo}", "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
 
@@ -213,7 +246,7 @@ def get_catalogo():
     if PARTNER_API_KEY:
         try:
             headers = {"Authorization": f"Bearer {PARTNER_API_KEY}"}
-            resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products", headers=headers, timeout=10)
+            resp_gg = requests.get(f"{PARTNER_API_URL}/catalog/products?limit=300", headers=headers, timeout=10)
             if resp_gg.status_code == 200:
                 for p in resp_gg.json().get("data", []):
                     try:
@@ -239,7 +272,7 @@ def get_catalogo():
     # 2. MOTOR CANBOSO
     if CANBOSO_API_KEY:
         try:
-            resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}", timeout=10)
+            resp_canboso = requests.get(f"https://canboso.com/api/v2/telegram-buyer/products?key={CANBOSO_API_KEY}&limit=300", timeout=10)
             if resp_canboso.status_code == 200:
                 for p in resp_canboso.json().get("products", []):
                     try:
@@ -270,7 +303,7 @@ def get_catalogo():
     if BUNAI_API_KEY:
         try:
             headers_bunai = {"X-API-Key": BUNAI_API_KEY}
-            resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=100", headers=headers_bunai, timeout=10)
+            resp_bunai = requests.get("https://api.bunaistore.shop/v1/products?view=variants&limit=300", headers=headers_bunai, timeout=10)
             if resp_bunai.status_code == 200:
                 for p in resp_bunai.json():
                     try:
@@ -299,16 +332,29 @@ def get_catalogo():
     if OPTIMUS_API_KEY:
         try:
             headers_optimus = {"X-API-Key": OPTIMUS_API_KEY}
-            resp_optimus = requests.get("https://optimusprime.click/api/telegram-buyer/products", headers=headers_optimus, timeout=10)
+            resp_optimus = requests.get("https://optimusprime.click/api/telegram-buyer/products?limit=300", headers=headers_optimus, timeout=10)
             if resp_optimus.status_code == 200:
                 data_optimus = resp_optimus.json()
                 prod_list = data_optimus.get("products", []) if isinstance(data_optimus, dict) else data_optimus
                 for p in prod_list:
                     try:
-                        estoque_valido = p.get("purchasable", True) and (safe_int(p.get("stock")) > 0 or p.get("infinite_stock", False) or p.get("delivery_mode") == "manual")
+                        # Buscando estoque em todos os cantos (Optimus esconde o estoque dependendo do tipo de produto)
+                        stock_val = p.get("stock")
+                        if stock_val is None and isinstance(p.get("stats"), dict):
+                            stock_val = p["stats"].get("available", 0)
+                        
+                        is_infinite = p.get("infinite_stock", False)
+                        is_manual = p.get("delivery_mode") == "manual"
+                        
+                        # Correção de booleanos vindos como string ("false")
+                        purchasable_val = p.get("purchasable", True)
+                        if isinstance(purchasable_val, str):
+                            purchasable_val = purchasable_val.lower() != "false"
+
+                        estoque_valido = purchasable_val and (safe_int(stock_val) > 0 or is_infinite or is_manual)
+                        
                         if estoque_valido:
                             custo_usd = safe_float(p.get("price") or p.get("pricing") or p.get("walletPricing") or 0)
-                            
                             preco_calculado = calcular_preco_dinamico(custo_usd)
                             raw_name = p.get("name") or p.get("product_name") or ""
                             nome_ptbr, resumo_ptbr = traduzir_e_resumir(raw_name)
