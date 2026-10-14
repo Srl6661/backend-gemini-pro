@@ -31,7 +31,7 @@ def enable_cors():
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
-# 🛡️ EXTRATORES INTELIGENTES (Lê números mesmo dentro de objetos/dicionários)
+# 🛡️ EXTRATORES INTELIGENTES
 def extrair_preco_usd(val, moeda_padrao="USD"):
     if val is None: return 0.0
     if isinstance(val, (int, float)): return float(val)
@@ -49,16 +49,13 @@ def extrair_preco_usd(val, moeda_padrao="USD"):
     return 0.0
 
 def extrair_estoque(p):
-    # Verifica se é estoque infinito ou entrega manual (sempre disponível)
     if p.get("infinite_stock") is True or str(p.get("infinite_stock")).lower() == "true": return True
     if p.get("delivery_mode") == "manual" or p.get("stock_type") == "manual": return True
     
-    # Verifica GGSoma
     if isinstance(p.get("stock"), dict):
         if p["stock"].get("inStock") is True: return True
         if p["stock"].get("available", 0) > 0: return True
 
-    # Verifica Canboso
     if isinstance(p.get("availability"), dict):
         av = p["availability"].get("available")
         if av is None or av == -1 or str(av) == "∞": return True
@@ -66,7 +63,6 @@ def extrair_estoque(p):
             if int(av) > 0: return True
         except: pass
 
-    # Verifica Optimus (stats.available ou credit_tiers)
     if isinstance(p.get("stats"), dict):
         av = p["stats"].get("available")
         if av is not None:
@@ -80,7 +76,6 @@ def extrair_estoque(p):
                 if int(tier.get("count", 0)) > 0: return True
             except: pass
 
-    # Verifica campos diretos (stock, stock_count, available)
     for k in ["stock", "stock_count", "available"]:
         val = p.get(k)
         if val is not None and not isinstance(val, dict):
@@ -182,10 +177,54 @@ def obter_categoria(nome_produto):
         return 'Entretenimento'
     return 'Licença Premium'
 
+# 🕵️‍♂️ FILTRO BLINDADO ANTI-RASTREIO (Extrai infos úteis e destrói qualquer rastro do fornecedor)
+def extrair_detalhes_seguros(desc_original, nome_lower=""):
+    if not desc_original:
+        return ""
+    
+    texto = str(desc_original)
+    # 1. Destrói códigos de custom emoji do Telegram: {ce:123...} ou <<ce:123...>>
+    texto = re.sub(r'[<\{]*ce:\d+[>\}]*', '', texto, flags=re.IGNORECASE)
+    # 2. Remove HTML
+    texto = re.sub(r'<[^>]+>', ' ', texto)
+    
+    texto_lower = texto.lower()
+    avisos = []
+    
+    # 3. Reconstrói apenas as informações importantes em Português (Impossível buscar no Google!)
+    if 'vietnam' in texto_lower or 'vietnã' in texto_lower:
+        avisos.append("Requer VPN (Vietnã) apenas no 1º acesso")
+    elif 'india' in texto_lower or 'índia' in texto_lower:
+        avisos.append("Requer VPN (Índia) apenas na ativação")
+    elif 'vpn' in texto_lower and 'vpn' not in nome_lower:
+        avisos.append("Pode requerer VPN na ativação")
+        
+    if any(x in texto_lower for x in ['own account', 'your account', 'sua conta', 'personal account']):
+        avisos.append("Ativação direto na sua conta")
+    elif any(x in texto_lower for x in ['new account', 'provided account', 'conta pronta', 'full account']):
+        avisos.append("Conta pronta exclusiva enviada após a compra")
+        
+    if any(x in texto_lower for x in ['coupon', 'redeem code', 'voucher', 'cupom']):
+        avisos.append("Ativação via Código/Cupom Oficial")
+        
+    if any(x in texto_lower for x in ['need card', 'requires card', 'precisa de cartão', 'credit card']):
+        avisos.append("Requer cartão para ativar assinatura")
+        
+    match_garantia = re.search(r'(\d+)[-\s]*days?\s*warranty', texto_lower)
+    if match_garantia and 'gemini' not in nome_lower and 'google' not in nome_lower:
+        avisos.append(f"Garantia de {match_garantia.group(1)} dias")
+        
+    if avisos:
+        return " 📌 Especificações: " + " • ".join(avisos) + "."
+    return ""
+
 def traduzir_e_resumir(nome_original, desc_original=""):
     nome_base = str(nome_original).replace("None", "").strip()
     
-    # Limpa códigos internos de fornecedores mas MANTÉM o nome real da variação!
+    # Remove qualquer código {ce:...} que porventura venha no título também
+    nome_base = re.sub(r'[<\{]*ce:\d+[>\}]*', '', nome_base, flags=re.IGNORECASE)
+    
+    # Limpa códigos internos de fornecedores mantendo o nome real da variação
     nome_base = re.sub(r'\b(CDK\s*FW|CDK\s*NW|CDK|FW|NW|W5D|W6D)\b', '', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'(\(NW\)|\(FW\)|\(W5D\)|\(W6D\))', '', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'Link to Receive\s*', '', nome_base, flags=re.IGNORECASE)
@@ -193,7 +232,7 @@ def traduzir_e_resumir(nome_original, desc_original=""):
     nome_base = re.sub(r'>', '-', nome_base)
     nome_base = re.sub(r'\|', '-', nome_base)
     
-    # Padroniza o tempo dentro do próprio nome sem destruir as variações (Ex: 7D, 1M, 12M, 1 Year)
+    # Padroniza o tempo e termos em inglês no título
     nome_base = re.sub(r'\b(\d+)\s*Years?\b', lambda m: f"{int(m.group(1))*12} meses", nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b1[-\s]*months?\b', '30 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b1[-\s]*m\b', '30 dias', nome_base, flags=re.IGNORECASE)
@@ -201,15 +240,15 @@ def traduzir_e_resumir(nome_original, desc_original=""):
     nome_base = re.sub(r'\b(\d+)[-\s]*m\b', r'\1 meses', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b(\d+)[-\s]*d\b', r'\1 dias', nome_base, flags=re.IGNORECASE)
     nome_base = re.sub(r'\b(\d+)[-\s]*days?\b', r'\1 dias', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b(\d+)\s*seats?\b', r'\1 vagas', nome_base, flags=re.IGNORECASE)
+    nome_base = re.sub(r'\b(\d+)\s*users?\b', r'\1 usuários', nome_base, flags=re.IGNORECASE)
     
     nome_base = re.sub(r'\s+', ' ', nome_base).strip(' -')
     nome_lower = nome_base.lower()
     
-    # Verifica se já tem tempo escrito no nome. Se não tiver, adiciona (30 dias) como padrão
     tem_tempo = re.search(r'(\d+\s*dias|\d+\s*meses|\d+\s*anos|vital[ií]cio|lifetime|credit|cr[eé]dito)', nome_lower)
     sufixo_tempo = "" if tem_tempo else " (30 dias)"
     
-    # Se for o Gemini principal, destaca como Google Pro mantendo os meses (ex: 18 meses, 30 dias)
     if 'gemini pro' in nome_lower:
         match_t = re.search(r'(\d+\s*meses|\d+\s*dias)', nome_lower)
         t_str = f" ({match_t.group(1)})" if match_t else sufixo_tempo
@@ -217,7 +256,7 @@ def traduzir_e_resumir(nome_original, desc_original=""):
     else:
         nome_lindo = f"{nome_base}{sufixo_tempo}"
 
-    # 🌟 TEXTOS DESCRITIVOS
+    # 🌟 TEXTOS DESCRITIVOS PRÓPRIOS (100% White-Label)
     desc_linda = "Licença premium oficial e original. Entrega rápida via WhatsApp após confirmação do Pix."
     
     if 'gemini' in nome_lower: desc_linda = "Pacote completo: Gemini Advanced, Veo, Meet Premium e nuvem ampliada. BÔNUS: YouTube Premium Lite. 🛡️ GARANTIA: 20 dias específicos para a conta Google."
@@ -252,13 +291,14 @@ def traduzir_e_resumir(nome_original, desc_original=""):
     elif 'windows' in nome_lower: desc_linda = "Licença de ativação original do Windows. Mais segurança e desempenho para seu PC."
     elif 'adobe' in nome_lower: desc_linda = "Crie posts sociais, vídeos curtos, flyers e edições incríveis com a suíte criativa da Adobe."
     elif 'leonardo' in nome_lower: desc_linda = "Geração de imagens incríveis e artes digitais usando modelos de IA de ponta."
+    elif 'granola' in nome_lower: desc_linda = "Assistente de reuniões com Inteligência Artificial que transforma suas conversas em notas organizadas."
+    elif 'linear' in nome_lower: desc_linda = "A ferramenta de gerenciamento de projetos e tarefas mais rápida e moderna para equipes."
+    elif 'n8n' in nome_lower: desc_linda = "Automatize processos e integre centenas de sistemas e IAs de forma visual."
 
-    # 📌 PRESERVA AVISOS IMPORTANTES DO FORNECEDOR
-    if desc_original:
-        desc_limpa = re.sub(r'<[^>]+>', ' ', str(desc_original)).strip()
-        desc_limpa = re.sub(r'\s+', ' ', desc_limpa)
-        if len(desc_limpa) > 10 and desc_limpa.lower() not in nome_lower:
-            desc_linda = f"{desc_linda} 📌 Detalhes: {desc_limpa[:220]}"
+    # 📌 Anexa APENAS especificações traduzidas e 100% impossíveis de rastrear no Google
+    detalhes_seguros = extrair_detalhes_seguros(desc_original, nome_lower)
+    if detalhes_seguros:
+        desc_linda += detalhes_seguros
             
     return nome_lindo, desc_linda
 
@@ -279,14 +319,12 @@ def calcular_preco_dinamico(custo_usd):
 def buscar_todos_fornecedores():
     catalogo_tratado = []
     chaves_processadas = set()
-    relatorio_debug = {"ggsoma": 0, "canboso": 0, "bunai": 0, "optimus": 0, "erros": []}
 
-    def adicionar_ao_catalogo(id_prod, raw_name, custo_usd, desc_original, origem):
+    def adicionar_ao_catalogo(id_prod, raw_name, custo_usd, desc_original):
         if not raw_name or custo_usd <= 0:
             return
         nome_ptbr, resumo_ptbr = traduzir_e_resumir(raw_name, desc_original)
         
-        # Chave de desduplicação baseada no nome limpo (mantém variações diferentes!)
         chave = nome_ptbr.lower().strip()
         if chave not in chaves_processadas:
             preco_calculado = calcular_preco_dinamico(custo_usd)
@@ -294,15 +332,12 @@ def buscar_todos_fornecedores():
                 "id": str(id_prod),
                 "nome": nome_ptbr,
                 "precoBase": preco_calculado,
-                "custoUsd": custo_usd,
                 "logoDomain": obter_dominio_logo(raw_name + " " + nome_ptbr),
                 "categoria": obter_categoria(raw_name + " " + nome_ptbr),
                 "estoque": True,
-                "descricao": resumo_ptbr,
-                "origem": origem
+                "descricao": resumo_ptbr
             })
             chaves_processadas.add(chave)
-            relatorio_debug[origem] += 1
 
     # 1. MOTOR GGSOMA
     if PARTNER_API_KEY:
@@ -316,9 +351,9 @@ def buscar_todos_fornecedores():
                     try:
                         if extrair_estoque(p):
                             custo = extrair_preco_usd(p.get("yourPrice") or p.get("price"))
-                            adicionar_ao_catalogo(p.get("slug") or p.get("id"), p.get("name"), custo, p.get("description", ""), "ggsoma")
-                    except Exception as e: pass
-        except Exception as e: relatorio_debug["erros"].append(f"GGSoma: {str(e)}")
+                            adicionar_ao_catalogo(p.get("slug") or p.get("id"), p.get("name"), custo, p.get("description", ""))
+                    except: pass
+        except Exception as e: print(f"Erro GGSoma: {e}")
 
     # 2. MOTOR CANBOSO
     if CANBOSO_API_KEY:
@@ -331,11 +366,11 @@ def buscar_todos_fornecedores():
                     try:
                         if extrair_estoque(p):
                             custo = extrair_preco_usd(p.get("price"))
-                            adicionar_ao_catalogo(p.get("productId") or p.get("id"), p.get("name"), custo, p.get("description", ""), "canboso")
-                    except Exception as e: pass
-        except Exception as e: relatorio_debug["erros"].append(f"Canboso: {str(e)}")
+                            adicionar_ao_catalogo(p.get("productId") or p.get("id"), p.get("name"), custo, p.get("description", ""))
+                    except: pass
+        except Exception as e: print(f"Erro Canboso: {e}")
 
-    # 3. MOTOR BUNAI STORE (Com paginação automática de 100 em 100 para pegar TUDO)
+    # 3. MOTOR BUNAI STORE
     if BUNAI_API_KEY:
         try:
             headers_bunai = {"X-API-Key": BUNAI_API_KEY}
@@ -350,15 +385,15 @@ def buscar_todos_fornecedores():
                             if extrair_estoque(p):
                                 custo = extrair_preco_usd(p.get("price"))
                                 nome_b = p.get("display_name") or p.get("name") or f"{p.get('group_name','')} {p.get('variant_name','')}".strip()
-                                adicionar_ao_catalogo(p.get("product_id"), nome_b, custo, p.get("note", ""), "bunai")
-                        except Exception as e: pass
+                                adicionar_ao_catalogo(p.get("product_id"), nome_b, custo, p.get("note", ""))
+                        except: pass
                     if len(lista) < 100:
                         break
                 else:
                     break
-        except Exception as e: relatorio_debug["erros"].append(f"Bunai: {str(e)}")
+        except Exception as e: print(f"Erro Bunai: {e}")
 
-    # 4. MOTOR OPTIMUS PRIME (Sem parâmetros estranhos que bloqueiam a lista e lendo todos os formatos de preço)
+    # 4. MOTOR OPTIMUS PRIME
     if OPTIMUS_API_KEY:
         try:
             headers_optimus = {"X-API-Key": OPTIMUS_API_KEY}
@@ -384,11 +419,11 @@ def buscar_todos_fornecedores():
                             desc_orig = p.get("custom_description") or p.get("description") or p.get("note") or ""
                             id_opt = p.get("product_id") or p.get("id") or p.get("_id")
                             
-                            adicionar_ao_catalogo(id_opt, raw_name, custo, desc_orig, "optimus")
-                    except Exception as e: pass
-        except Exception as e: relatorio_debug["erros"].append(f"Optimus: {str(e)}")
+                            adicionar_ao_catalogo(id_opt, raw_name, custo, desc_orig)
+                    except: pass
+        except Exception as e: print(f"Erro Optimus: {e}")
 
-    return catalogo_tratado, relatorio_debug
+    return catalogo_tratado
 
 @app.route('/')
 def index():
@@ -399,20 +434,8 @@ def get_catalogo():
     response.content_type = 'application/json'
     if request.method == 'OPTIONS': return json.dumps({})
     
-    catalogo, _ = buscar_todos_fornecedores()
-    # Remove campos internos antes de enviar pro navegador do cliente
-    for item in catalogo:
-        item.pop("custoUsd", None)
-        item.pop("origem", None)
+    catalogo = buscar_todos_fornecedores()
     return json.dumps(catalogo)
-
-# 🕵️‍♂️ ROTA DE DIAGNÓSTICO (Para você ver quantos produtos vieram de cada fornecedor)
-@app.route('/api/debug', method=['GET'])
-def debug_catalogo():
-    response.content_type = 'application/json'
-    catalogo, relatorio = buscar_todos_fornecedores()
-    relatorio["total_na_vitrine"] = len(catalogo)
-    return json.dumps(relatorio, indent=2)
 
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
@@ -428,8 +451,7 @@ def gerar_pix():
         
     if quantidade <= 0: return {"error": "Quantidade deve ser maior que zero."}
 
-    # Busca direto no motor unificado para garantir 100% de precisão no preço e ID
-    catalogo, _ = buscar_todos_fornecedores()
+    catalogo = buscar_todos_fornecedores()
     produto_encontrado = None
     for item in catalogo:
         if str(item.get("id")) == produto_id:
