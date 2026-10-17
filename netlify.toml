@@ -1,6 +1,0 @@
-[build]
-  command = "node scripts/gerar-preview.mjs"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "20"
