@@ -7,6 +7,8 @@ import hashlib
 import requests
 import json
 import re
+import time
+import threading
 
 app = Bottle()
 
@@ -17,6 +19,9 @@ CANBOSO_API_KEY = os.environ.get('CANBOSO_API_KEY')
 BUNAI_API_KEY = os.environ.get('BUNAI_API_KEY')     
 OPTIMUS_API_KEY = os.environ.get('OPTIMUS_API_KEY') 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'chave-secreta-padrao-123')
+# Número do WhatsApp (só dígitos, com 55 e DDD). Fica só no servidor e só é entregue após pagamento aprovado.
+WHATSAPP_NUMERO = re.sub(r'\D', '', os.environ.get('WHATSAPP_NUMERO', ''))
+INTERVALO_ATUALIZACAO = int(os.environ.get('CATALOGO_INTERVALO', 300))  # segundos entre atualizações do catálogo
 
 PARTNER_API_URL = "https://ggsoma.store/api/partner/v1"
 
@@ -425,6 +430,74 @@ def buscar_todos_fornecedores():
 
     return catalogo_tratado
 
+# ⚡ CACHE DO CATÁLOGO: o site responde na hora e a atualização com os fornecedores roda em segundo plano
+CACHE_ARQUIVO = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'catalogo_cache.json')
+_cache = {"dados": [], "atualizado_em": 0}
+_cache_lock = threading.Lock()
+_primeira_carga = threading.Event()
+
+def _salvar_cache_disco(dados):
+    try:
+        tmp = CACHE_ARQUIVO + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(dados, f, ensure_ascii=False)
+        os.replace(tmp, CACHE_ARQUIVO)
+    except Exception as e:
+        print(f"Aviso: não salvou cache em disco: {e}")
+
+def _carregar_cache_disco():
+    try:
+        with open(CACHE_ARQUIVO, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+        return dados if isinstance(dados, list) else []
+    except Exception:
+        return []
+
+def atualizar_catalogo():
+    try:
+        novo = buscar_todos_fornecedores()
+    except Exception as e:
+        print(f"Erro ao atualizar catálogo: {e}")
+        novo = []
+    salvar = False
+    with _cache_lock:
+        antigo = len(_cache["dados"])
+        # Só troca se veio algo e não parece uma queda de fornecedor (menos da metade do que já tínhamos)
+        if novo and (antigo == 0 or len(novo) >= antigo * 0.5):
+            _cache["dados"] = novo
+            _cache["atualizado_em"] = time.time()
+            salvar = True
+        else:
+            print(f"Catálogo mantido (novo={len(novo)}, antigo={antigo}).")
+    if salvar:
+        _salvar_cache_disco(novo)
+    _primeira_carga.set()
+
+def _loop_atualizacao():
+    while True:
+        atualizar_catalogo()
+        time.sleep(INTERVALO_ATUALIZACAO)
+
+def obter_catalogo():
+    if not _cache["dados"]:
+        _primeira_carga.wait(timeout=40)  # só acontece se o servidor acabou de ligar sem cache
+    with _cache_lock:
+        return list(_cache["dados"])
+
+def iniciar_atualizacao_em_segundo_plano():
+    dados = _carregar_cache_disco()
+    if dados:
+        _cache["dados"] = dados
+        _cache["atualizado_em"] = time.time()
+        _primeira_carga.set()
+    threading.Thread(target=_loop_atualizacao, daemon=True).start()
+
+iniciar_atualizacao_em_segundo_plano()
+
+@app.route('/health')
+def health():
+    return {"ok": True, "produtos": len(_cache["dados"])}
+
 @app.route('/')
 def index():
     return static_file('index.html', root=os.path.abspath(os.path.dirname(__file__)))
@@ -434,8 +507,8 @@ def get_catalogo():
     response.content_type = 'application/json'
     if request.method == 'OPTIONS': return json.dumps({})
     
-    catalogo = buscar_todos_fornecedores()
-    return json.dumps(catalogo)
+    response.set_header('Cache-Control', 'public, max-age=60')
+    return json.dumps(obter_catalogo())
 
 @app.route('/gerar-pix', method=['POST', 'OPTIONS'])
 def gerar_pix():
@@ -450,8 +523,10 @@ def gerar_pix():
         return {"error": "Quantidade inválida."}
         
     if quantidade <= 0: return {"error": "Quantidade deve ser maior que zero."}
+    if quantidade > 50: return {"error": "Quantidade máxima por pedido: 50."}
+    if not client_id: return {"error": "Pedido inválido."}
 
-    catalogo = buscar_todos_fornecedores()
+    catalogo = obter_catalogo()
     produto_encontrado = None
     for item in catalogo:
         if str(item.get("id")) == produto_id:
@@ -504,7 +579,11 @@ def status_pagamento(id):
     
     if status == "approved":
         resposta["codigo_pedido"] = gerar_codigo_pedido(id)
-            
+        # O WhatsApp só é entregue a quem gerou aquele Pix (confere o client_id do pedido)
+        cid = request.query.get('cid', '')
+        if WHATSAPP_NUMERO and cid and hmac.compare_digest(str(payment.get("external_reference", "")), cid):
+            resposta["whatsapp"] = WHATSAPP_NUMERO
+
     return resposta
 
 if __name__ == '__main__':
