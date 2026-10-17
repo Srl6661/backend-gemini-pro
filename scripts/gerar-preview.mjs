@@ -1,7 +1,7 @@
 // Roda sozinho a cada deploy no Netlify (veja netlify.toml).
 // Busca o catálogo no backend, grava a prévia dentro do index.html e gera a pasta dist/.
 // Se o backend estiver fora do ar, reaproveita a prévia do site já publicado. Nunca derruba o deploy.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from 'node:fs';
 
 const API = process.env.CATALOGO_API || 'https://backend-gemini-pro-ocp5.onrender.com';
 const SITE = process.env.URL || ''; // o Netlify já informa o endereço do site no build
@@ -57,4 +57,13 @@ if (!PADRAO.test(html)) {
 
 mkdirSync('dist', { recursive: true });
 writeFileSync('dist/index.html', html);
+// Arquivos extras que precisam ir para o site publicado (imagem que aparece ao compartilhar o link)
+for (const arquivo of ['og-image.jpg']) {
+  if (existsSync(arquivo)) {
+    copyFileSync(arquivo, `dist/${arquivo}`);
+    console.log(`${arquivo} copiado para dist/.`);
+  } else {
+    console.log(`Aviso: ${arquivo} não encontrado na raiz do repositório.`);
+  }
+}
 console.log('dist/index.html pronto.');
