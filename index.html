@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup VIP BR - Licenças Premium Oficiais</title>
+
+    <!-- SEO e compartilhamento -->
+    <meta name="description" content="ChatGPT Plus, Gemini, Canva Pro e outras ferramentas de IA e produtividade com preço justo. Pague com Pix e receba a liberação pelo WhatsApp com suporte humano.">
+    <meta name="theme-color" content="#050814">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://setupvip-licencas-br.netlify.app/">
+    <meta property="og:image" content="https://setupvip-licencas-br.netlify.app/og-image.jpg?v=1">
+    <meta property="og:image:secure_url" content="https://setupvip-licencas-br.netlify.app/og-image.jpg?v=1">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Setup VIP BR - Licenças Premium">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Setup VIP BR">
+    <meta property="og:title" content="Setup VIP BR - Licenças Premium">
+    <meta property="og:description" content="Ferramentas de IA e produtividade com preço justo. Pix e liberação rápida pelo WhatsApp.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://setupvip-licencas-br.netlify.app/og-image.jpg?v=1">
+    <meta name="twitter:title" content="Setup VIP BR - Licenças Premium">
+    <meta name="twitter:description" content="Ferramentas de IA e produtividade com preço justo. Pix e liberação rápida pelo WhatsApp.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>⚡</text></svg>">
+
+    <!-- Acorda a conexão com o backend mais cedo -->
+    <link rel="preconnect" href="https://backend-gemini-pro-ocp5.onrender.com" crossorigin>
+
+    <script>
+        const API_BASE_URL = "https://backend-gemini-pro-ocp5.onrender.com";
+        // Dispara a busca do catálogo imediatamente (antes do Tailwind e das fontes terminarem de carregar)
+        window.__catalogoPromise = fetch(API_BASE_URL + '/api/catalogo')
+            .then(r => r.ok ? r.json() : null)
+            .then(d => Array.isArray(d) ? d : null)
+            .catch(() => null);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: {
+            fontFamily: { sans: ['"DM Sans"', 'system-ui', 'sans-serif'], display: ['"Bricolage Grotesque"', '"DM Sans"', 'sans-serif'] }
+        } } };
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        h1, h2, h3 { font-family: 'Bricolage Grotesque', 'DM Sans', sans-serif; letter-spacing: -0.02em; }
+        #contador-catalogo [id^="contador-"], #contador-licencas [id^="contador-"], #vitrine .text-3xl { font-family: 'Bricolage Grotesque', 'DM Sans', sans-serif; }
+        #vitrine > div { transition: border-color .2s, box-shadow .2s, transform .2s; }
+    </style>
+<style id="setupvip-neon-theme">
+/* =========================================================
+   SETUP VIP — NEON / FUTURISTIC THEME
+   Visual only: preserves the existing catalog, Pix and JS.
+   ========================================================= */
+
+:root{
+  --sv-bg:#050814;
+  --sv-panel:rgba(10,18,38,.78);
+  --sv-panel-2:rgba(13,24,50,.92);
+  --sv-blue:#00b7ff;
+  --sv-cyan:#22e7ff;
+  --sv-purple:#9b5cff;
+  --sv-pink:#ff3fd8;
+  --sv-green:#00f5a0;
+  --sv-text:#f5f8ff;
+  --sv-muted:#9aa9c4;
+  --sv-border:rgba(67,190,255,.22);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:
+    radial-gradient(circle at 12% 8%, rgba(0,183,255,.16), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(155,92,255,.16), transparent 28%),
+    radial-gradient(circle at 50% 80%, rgba(255,63,216,.08), transparent 30%),
+    linear-gradient(135deg,#03050c 0%,#071022 48%,#040711 100%) !important;
+  color:var(--sv-text) !important;
+  position:relative;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:.22;
+  background-image:
+    linear-gradient(rgba(0,183,255,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,183,255,.07) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent 92%);
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  width:420px;
+  height:420px;
+  right:-180px;
+  top:220px;
+  border-radius:50%;
+  background:rgba(155,92,255,.12);
+  filter:blur(90px);
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* Top security bar */
+body > div:first-child{
+  background:linear-gradient(90deg,#06162c,#081b39,#06162c) !important;
+  color:#bdefff !important;
+  border-bottom:1px solid rgba(0,183,255,.25);
+  box-shadow:0 0 28px rgba(0,183,255,.10);
+}
+
+/* Header / hero */
+header{
+  background:
+    radial-gradient(circle at 50% 20%,rgba(0,183,255,.24),transparent 38%),
+    radial-gradient(circle at 15% 80%,rgba(155,92,255,.20),transparent 30%),
+    linear-gradient(135deg,#030711,#07162d 52%,#10091d) !important;
+  min-height:300px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid rgba(0,183,255,.25);
+  box-shadow:0 20px 70px rgba(0,0,0,.45), inset 0 -1px 0 rgba(0,183,255,.12);
+}
+
+header > div:first-child{
+  opacity:.16 !important;
+  background-image:
+    linear-gradient(rgba(0,183,255,.16) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,183,255,.16) 1px,transparent 1px) !important;
+  background-size:28px 28px !important;
+}
+
+@keyframes gradientAnimado {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+header h1 {
+  font-size: clamp(2.6rem, 7vw, 5rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: -.045em !important;
+  color: #fff !important;
+  background: none !important;
+  animation: none !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 0 16px rgba(122, 60, 255, .35));
+}
+
+header p{
+  color:#b9c8e2 !important;
+}
+
+header .bg-blue-800{
+  background:rgba(0,183,255,.10) !important;
+  border-color:rgba(34,231,255,.45) !important;
+  color:#8feeff !important;
+  box-shadow:0 0 24px rgba(0,183,255,.10);
+}
+
+/* Product/category/search area */
+main{
+  position:relative;
+}
+
+#input-busca{
+  background:rgba(7,14,30,.82) !important;
+  color:#fff !important;
+  border:1px solid rgba(0,183,255,.28) !important;
+  box-shadow:0 0 0 1px rgba(0,183,255,.04),0 12px 40px rgba(0,0,0,.25), inset 0 0 25px rgba(0,183,255,.03) !important;
+  backdrop-filter:blur(16px);
+}
+
+#input-busca::placeholder{color:#7283a2 !important}
+#input-busca:focus{
+  border-color:rgba(34,231,255,.85) !important;
+  box-shadow:0 0 0 3px rgba(0,183,255,.10),0 0 32px rgba(0,183,255,.18) !important;
+}
+
+#titulo-vitrine{
+  color:#fff !important;
+  text-shadow:0 0 22px rgba(0,183,255,.16);
+}
+
+main .text-gray-500{color:#8d9bb5 !important}
+
+/* Dynamic category buttons */
+#filtros-categoria button{
+  background:rgba(8,16,34,.74) !important;
+  color:#aab9d3 !important;
+  border-color:rgba(70,115,170,.28) !important;
+  box-shadow:none !important;
+  backdrop-filter:blur(12px);
+}
+
+#filtros-categoria button:hover{
+  color:#fff !important;
+  border-color:rgba(0,183,255,.7) !important;
+  box-shadow:0 0 20px rgba(0,183,255,.12) !important;
+}
+
+#filtros-categoria button[data-ativo="true"]{
+  color:#fff !important;
+  background:linear-gradient(135deg,#007cff,#7b35ff) !important;
+  border-color:transparent !important;
+  box-shadow:0 0 24px rgba(0,183,255,.25) !important;
+}
+
+/* Product cards generated by JS */
+#vitrine > div{
+  background:
+    linear-gradient(145deg,rgba(15,27,55,.92),rgba(6,12,27,.96)) !important;
+  border:1px solid var(--sv-border) !important;
+  border-radius:20px !important;
+  box-shadow:0 15px 45px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04) !important;
+  backdrop-filter:blur(14px);
+  overflow:visible;
+}
+
+#vitrine > div:hover{
+  border-color:rgba(34,231,255,.52) !important;
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.42),
+    0 0 35px rgba(0,183,255,.12),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+  transform:translateY(-7px) !important;
+}
+
+#vitrine > div .bg-gray-50{
+  background:rgba(255,255,255,.045) !important;
+  border-color:rgba(120,170,220,.16) !important;
+}
+
+#vitrine > div h3,
+#vitrine > div .text-gray-900{
+  color:#f5f8ff !important;
+}
+
+#vitrine > div .text-gray-500{
+  color:#93a2bd !important;
+}
+
+#vitrine > div .border-gray-100{
+  border-color:rgba(120,170,220,.13) !important;
+}
+
+#vitrine > div .text-blue-600{
+  color:#56ddff !important;
+}
+
+#vitrine > div .bg-blue-100{
+  background:rgba(0,183,255,.10) !important;
+}
+
+#vitrine > div button{
+  background:linear-gradient(135deg,#008cff,#763cff) !important;
+  border:1px solid rgba(119,232,255,.25);
+  box-shadow:0 0 22px rgba(0,140,255,.18) !important;
+}
+
+#vitrine > div button:hover{
+  background:linear-gradient(135deg,#00b7ff,#9b5cff) !important;
+  box-shadow:0 0 30px rgba(0,183,255,.28) !important;
+}
+
+#vitrine > div .text-green-600,
+#vitrine > div .text-emerald-700{
+  color:#52f3bb !important;
+}
+
+#vitrine > div .bg-emerald-50{
+  background:rgba(0,245,160,.08) !important;
+  border-color:rgba(0,245,160,.22) !important;
+}
+
+#vitrine > div .bg-red-50{
+  background:rgba(255,63,100,.08) !important;
+}
+
+/* "Mais vendido" */
+#vitrine > div .bg-red-600{
+  background:linear-gradient(90deg,#ff315d,#ff3fae) !important;
+  box-shadow:0 0 24px rgba(255,49,93,.28) !important;
+}
+
+/* Trust strip */
+body > div:nth-of-type(2){
+  background:rgba(5,11,24,.82) !important;
+  border-color:rgba(67,190,255,.14) !important;
+  box-shadow:0 8px 30px rgba(0,0,0,.22);
+  backdrop-filter:blur(14px);
+}
+
+body > div:nth-of-type(2) span{
+  color:#a8bad6 !important;
+}
+
+/* Testimonials / FAQ cards */
+main .bg-white{
+  background:rgba(9,17,35,.78) !important;
+  border-color:rgba(67,190,255,.15) !important;
+  color:#dce6f8 !important;
+  box-shadow:0 12px 40px rgba(0,0,0,.22) !important;
+  backdrop-filter:blur(14px);
+}
+
+main .bg-white h3,
+main .bg-white h4,
+main .bg-white .text-gray-900{
+  color:#f4f8ff !important;
+}
+
+main .bg-white p,
+main .bg-white .text-gray-600{
+  color:#93a2bd !important;
+}
+
+main .border-t{
+  border-color:rgba(67,190,255,.12) !important;
+}
+
+/* Footer */
+footer{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,183,255,.10),transparent 35%),
+    #03060f !important;
+  border-color:rgba(67,190,255,.16) !important;
+}
+
+footer h3{color:#fff !important}
+footer p{color:#71819e !important}
+
+/* Checkout modal */
+#modal-checkout{
+  background:rgba(1,4,12,.84) !important;
+  backdrop-filter:blur(14px);
+}
+
+#modal-checkout > div{
+  background:linear-gradient(145deg,#0b152c,#060c1c) !important;
+  border:1px solid rgba(34,231,255,.24);
+  color:#fff !important;
+  box-shadow:0 30px 100px rgba(0,0,0,.60),0 0 45px rgba(0,183,255,.10);
+}
+
+#modal-checkout h3,
+#modal-checkout .text-gray-900,
+#modal-checkout label{
+  color:#f5f8ff !important;
+}
+
+#modal-checkout .text-gray-500,
+#modal-checkout .text-gray-600{
+  color:#92a1bc !important;
+}
+
+#quantidade,
+#input-copia-cola{
+  background:rgba(255,255,255,.045) !important;
+  color:#fff !important;
+  border-color:rgba(67,190,255,.20) !important;
+}
+
+#preco-total{color:#47f1b3 !important}
+
+#btn-gerar-pix{
+  background:linear-gradient(135deg,#00b979,#00e7a1) !important;
+  box-shadow:0 0 28px rgba(0,231,161,.18) !important;
+}
+
+#link-whatsapp-final{
+  background:linear-gradient(135deg,#00b979,#00e7a1) !important;
+}
+
+/* Small neon accents */
+#contador-catalogo, #contador-licencas {
+  background:rgba(4,13,29,.56) !important;
+  border-color:rgba(34,231,255,.20) !important;
+  box-shadow:0 0 28px rgba(0,183,255,.10) !important;
+}
+
+@media (max-width:640px){
+  header{min-height:260px;padding-top:4rem !important;padding-bottom:4rem !important}
+  header h1{font-size:2.7rem !important}
+  #contador-catalogo{transform:scale(.82);transform-origin:top right}
+  #contador-licencas{transform:scale(.82);transform-origin:top left}
+  #vitrine > div{border-radius:18px !important}
+}
+</style>
+<style id="setupvip-neon-extras">
+/* Ajustes do tema neon para os componentes novos */
+#vitrine > div .bg-amber-500{ background:linear-gradient(90deg,#ff315d,#ff3fae) !important; box-shadow:0 0 24px rgba(255,49,93,.28) !important; }
+#vitrine > div{ min-width:0; }
+#vitrine > div h3{ overflow-wrap:anywhere; }
+#vitrine .preco-card{ font-size:clamp(1.55rem,2.1vw,1.875rem); }
+#vitrine > div .btn-comprar{ color:#fff !important; text-shadow:0 1px 10px rgba(0,0,0,.30); }
+#vitrine .bg-gray-200{ background:rgba(255,255,255,.08) !important; }
+main .text-blue-600{ color:#56ddff !important; }
+main .border-blue-600{ border-color:rgba(34,231,255,.55) !important; }
+main a.border-blue-600:hover{ background:linear-gradient(135deg,#008cff,#763cff) !important; color:#fff !important; border-color:transparent !important; }
+#modal-checkout .bg-gray-50{ background:rgba(255,255,255,.045) !important; border-color:rgba(67,190,255,.20) !important; }
+#modal-checkout .bg-blue-50{ background:rgba(0,183,255,.10) !important; color:#8feeff !important; }
+#modal-checkout .border-gray-100,#modal-checkout .border-gray-200{ border-color:rgba(67,190,255,.18) !important; }
+#modal-checkout .text-blue-600{ color:#56ddff !important; }
+#modal-legal{ background:rgba(1,4,12,.84) !important; backdrop-filter:blur(14px); }
+#modal-legal > div{ background:linear-gradient(145deg,#0b152c,#060c1c) !important; border:1px solid rgba(34,231,255,.24); box-shadow:0 30px 100px rgba(0,0,0,.60),0 0 45px rgba(0,183,255,.10); }
+#modal-legal h3,#modal-legal strong{ color:#f5f8ff !important; }
+#modal-legal .text-gray-600{ color:#92a1bc !important; }
+#modal-legal a{ background:linear-gradient(135deg,#008cff,#763cff) !important; }
+#toast-area > div{ background:rgba(8,16,34,.95) !important; border:1px solid rgba(34,231,255,.35); box-shadow:0 0 28px rgba(0,183,255,.18); }
+#toast-area > div.bg-red-600{ background:rgba(120,15,45,.95) !important; border-color:rgba(255,63,100,.5); }
+footer button:hover, footer a:hover{ color:#56ddff !important; }
+#aviso-preview{ background:rgba(0,183,255,.10) !important; border-color:rgba(34,231,255,.25) !important; color:#8feeff !important; }
+</style>
+
+<style id="setupvip-sempre">
+/* Fica ligado no tema claro e no escuro (o botão de tema só desliga os blocos neon) */
+header h1{ filter:drop-shadow(0 0 16px rgba(122,60,255,.35)); }
+@keyframes vipFluxo{ from{ background-position:0% 50%; } to{ background-position:200% 50%; } }
+header h1 .titulo-gradiente{
+  display:inline-block; padding-right:.06em;
+  background-image:linear-gradient(90deg,#00b7ff,#7a3cff,#ff3fae,#00b7ff) !important;
+  background-size:200% 100% !important; background-repeat:repeat-x !important;
+  -webkit-background-clip:text !important; background-clip:text !important;
+  -webkit-text-fill-color:transparent !important; color:transparent !important;
+  text-shadow:none !important; animation:vipFluxo 4s linear infinite !important;
+}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  header h1 .titulo-gradiente{ -webkit-text-fill-color:initial !important; color:#7ad8ff !important; }
+}
+
+/* ===== Fundo animado Setup VIP (leve: só transform/opacity) ===== */
+.sv-bg{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; contain:strict; }
+.sv-blob{ position:absolute; width:70vmax; height:70vmax; border-radius:50%; will-change:transform; }
+.sv-blob.b1{ left:-22vmax; top:-26vmax; background:radial-gradient(circle,rgba(0,183,255,.34),transparent 62%); animation:svA 30s ease-in-out infinite alternate; }
+.sv-blob.b2{ right:-26vmax; top:8vh; background:radial-gradient(circle,rgba(122,60,255,.38),transparent 62%); animation:svB 36s ease-in-out infinite alternate; }
+.sv-blob.b3{ left:12vw; bottom:-38vmax; background:radial-gradient(circle,rgba(255,63,174,.26),transparent 62%); animation:svC 42s ease-in-out infinite alternate; }
+@keyframes svA{ to{ transform:translate3d(20vmax,14vmax,0) scale(1.12); } }
+@keyframes svB{ to{ transform:translate3d(-18vmax,16vmax,0) scale(.92); } }
+@keyframes svC{ to{ transform:translate3d(16vmax,-12vmax,0) scale(1.15); } }
+.sv-vip{ position:absolute; right:-2vw; bottom:-4vh; font:900 clamp(12rem,34vw,34rem)/1 'Bricolage Grotesque','DM Sans',sans-serif; letter-spacing:-.06em;
+  color:transparent; -webkit-text-stroke:2px rgba(0,183,255,.07); user-select:none; will-change:transform; animation:svFloat 26s ease-in-out infinite alternate; }
+@keyframes svFloat{ to{ transform:translate3d(-3vw,-5vh,0); } }
+.sv-dot{ position:absolute; bottom:-12px; width:var(--s); height:var(--s); border-radius:50%; background:rgba(var(--c),.85); box-shadow:0 0 12px rgba(var(--c),.9);
+  opacity:0; will-change:transform,opacity; animation:svUp var(--d) linear infinite; animation-delay:var(--l); }
+@keyframes svUp{ 0%{ transform:translate3d(0,0,0); opacity:0; } 10%{ opacity:.85; } 90%{ opacity:.6; } 100%{ transform:translate3d(var(--x),-112vh,0); opacity:0; } }
+/* grade do tema neon desliza devagar (só transform) */
+body::before{ inset:-42px !important; will-change:transform; animation:svGrid 22s linear infinite; }
+@keyframes svGrid{ to{ transform:translate3d(42px,42px,0); } }
+/* tema claro: mesmo fundo, mais suave */
+html.tema-claro .sv-bg{ opacity:.55; }
+html.tema-claro .sv-vip{ -webkit-text-stroke-color:rgba(37,99,235,.12); }
+@media (max-width:640px){ .sv-dot{ display:none; } .sv-vip{ opacity:.6; } .sv-blob{ width:90vmax; height:90vmax; } }
+@media (prefers-reduced-motion:reduce){
+  .sv-blob,.sv-vip,.sv-dot,body::before{ animation:none !important; } .sv-dot{ display:none; }
+  header h1 .titulo-gradiente{ animation-duration:14s !important; }
+}
+</style>
+
+<!-- SCRIPT PARA PREVENIR O FLASH ESCURO SE O TEMA GUARDADO FOR CLARO -->
+<script>
+    if (localStorage.getItem('tema-setupvip') === 'claro') {
+        document.documentElement.classList.add('tema-claro');
+        document.getElementById('setupvip-neon-theme').disabled = true;
+        document.getElementById('setupvip-neon-extras').disabled = true;
+    }
+</script>
+
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased selection:bg-blue-200 transition-colors duration-500">
+
+    <!-- FAIXA DE SEGURANÇA SUPERIOR -->
+    <div class="bg-blue-900 text-blue-100 text-xs py-2 px-4 text-center font-bold tracking-wide flex items-center justify-center gap-2">
+        <span>🛡️ PAGAMENTO SEGURO VIA MERCADO PAGO</span>
+        <span class="hidden sm:inline">•</span>
+        <span class="hidden sm:inline">⚡ LIBERAÇÃO RÁPIDA E SUPORTE VIA WHATSAPP</span>
+    </div>
+
+    <!-- CABEÇALHO -->
+    <header class="bg-gradient-to-br from-gray-900 via-blue-900 to-blue-800 text-white py-16 text-center relative overflow-hidden shadow-md">
+        <div class="absolute inset-0" style="background-image: radial-gradient(60% 90% at 85% 0%, rgba(217,170,58,.32), transparent 60%), radial-gradient(45% 70% at 0% 100%, rgba(217,170,58,.14), transparent 60%), radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: auto, auto, 22px 22px;"></div>
+
+        <!-- CONTADOR DE LICENÇAS -->
+        <div id="contador-licencas" class="absolute top-3 left-3 sm:top-5 sm:left-6 z-20 opacity-0 translate-y-1 transition-all duration-700 flex items-stretch rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-lg overflow-hidden text-left">
+            <div class="px-3 sm:px-4 py-2 flex items-center gap-3">
+                <div class="flex items-center justify-center text-green-400 animate-pulse">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <div id="contador-vendas" class="text-xl sm:text-3xl font-black leading-none tabular-nums text-white">0</div>
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-blue-200 mt-1">Licenças Ativadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTADOR DO CATÁLOGO -->
+        <div id="contador-catalogo" class="absolute top-3 right-3 sm:top-5 sm:right-6 z-20 opacity-0 translate-y-1 transition-all duration-700 flex items-stretch rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-lg overflow-hidden text-left">
+            <div class="px-3 sm:px-4 py-2">
+                <div id="contador-produtos" class="text-xl sm:text-3xl font-black leading-none tabular-nums">0</div>
+                <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-blue-200 mt-1">Produtos</div>
+            </div>
+            <div class="w-px bg-white/20"></div>
+            <div class="px-3 sm:px-4 py-2">
+                <div id="contador-categorias" class="text-xl sm:text-3xl font-black leading-none tabular-nums">0</div>
+                <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-blue-200 mt-1">Categorias</div>
+            </div>
+        </div>
+
+        <div class="relative z-10 px-4">
+            <span class="inline-block py-1 px-3 rounded-full bg-blue-800 bg-opacity-60 border border-blue-400 text-blue-200 text-xs font-black tracking-widest mb-4 uppercase">⭐ Loja de Licenças Premium</span>
+            <h1 class="text-5xl sm:text-6xl font-extrabold mb-3"><span class="titulo-gradiente">Setup VIP</span> BR</h1>
+            <p class="text-base sm:text-lg text-blue-100 max-w-xl mx-auto font-light">As melhores ferramentas de Inteligência Artificial e Produtividade com garantia e preço justo.</p>
+        </div>
+    </header>
+
+    <!-- SELOS DE CONFIANÇA -->
+    <div class="bg-white border-b border-gray-200 py-4 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-around gap-4 text-xs font-bold text-gray-600">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span>Pagamento Seguro via Mercado Pago</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span>Liberação Rápida após o Pix</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                <span>Suporte Humano Dedicado</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+
+        <!-- BUSCA -->
+        <div class="mb-6 relative max-w-2xl mx-auto">
+            <input type="search" id="input-busca" oninput="buscaComDelay()" placeholder="Buscar ferramenta (ex: Canva, ChatGPT, YouTube...)" aria-label="Buscar ferramenta" class="w-full border-2 border-gray-200 rounded-xl px-5 py-3.5 pl-12 text-gray-700 focus:outline-none focus:border-blue-500 transition-colors shadow-sm font-medium bg-white">
+            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <!-- CATEGORIAS -->
+        <div class="mb-10 w-full overflow-x-auto no-scrollbar pb-3">
+            <div id="filtros-categoria" class="flex gap-3 justify-start sm:flex-wrap sm:justify-center px-1"></div>
+        </div>
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 id="titulo-vitrine" class="text-3xl font-extrabold text-gray-900 tracking-tight">Produtos em Destaque</h2>
+                <p class="text-gray-500 mt-1">Pague com Pix e receba a liberação pelo WhatsApp com suporte humano.</p>
+            </div>
+        </div>
+
+        <div id="aviso-preview" class="hidden mb-4 text-center text-sm font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-xl py-2.5 px-4"></div>
+
+        <div id="vitrine" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 min-h-[300px]"></div>
+
+        <!-- DEPOIMENTOS -->
+        <div class="mt-20 border-t border-gray-200 pt-16">
+            <div class="text-center mb-10">
+                <span class="text-blue-600 font-black text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Depoimentos Reais</span>
+                <h3 class="text-3xl font-black text-gray-900 mt-2">O que dizem nossos clientes</h3>
+                <p class="text-gray-500 text-sm mt-1">Quem compra recomenda a rapidez e segurança do nosso atendimento.</p>
+            </div>
+
+            <div id="grid-depoimentos" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="mt-20 border-t border-gray-200 pt-16 max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-blue-600 font-black text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100">Tire suas dúvidas</span>
+                <h3 class="text-3xl font-black text-gray-900 mt-2">Perguntas Frequentes</h3>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Como recebo meu acesso após o pagamento?</h4>
+                    <p class="text-gray-600 text-sm">Assim que o Pix é aprovado pelo Mercado Pago (geralmente em segundos), o site leva você ao nosso WhatsApp com os dados do pedido. Por lá a gente confere e libera o seu acesso, normalmente em poucos minutos.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h4 class="font-bold text-gray-900 text-base mb-1">As contas e licenças são oficiais e seguras?</h4>
+                    <p class="text-gray-600 text-sm">Trabalhamos com licenças originais e canais de distribuição oficiais, para você usar com estabilidade no dia a dia ou no trabalho.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h4 class="font-bold text-gray-900 text-base mb-1">E se eu tiver algum problema ou dúvida no acesso?</h4>
+                    <p class="text-gray-600 text-sm">Nosso suporte é feito por pessoas, direto no WhatsApp. Se acontecer qualquer imprevisto, é só chamar que resolvemos ou fazemos a troca. Os detalhes estão na <button type="button" onclick="abrirLegal('reembolso')" class="text-blue-600 font-bold underline">política de reembolso</button>.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h4 class="font-bold text-gray-900 text-base mb-1">Como funciona o preço de revenda?</h4>
+                    <p class="text-gray-600 text-sm">Ao comprar 5 ou mais unidades do mesmo produto, o valor unitário cai automaticamente. O preço final aparece na hora, antes de você gerar o Pix.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="bg-gray-900 text-gray-400 py-12 mt-20 border-t border-gray-800 text-center">
+        <div class="max-w-6xl mx-auto px-4">
+            <h3 class="text-white text-lg font-bold mb-2">Setup VIP BR</h3>
+            <p class="text-sm text-gray-500 mb-6">Plataforma de distribuição de licenças e softwares digitais.</p>
+            <nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold mb-6">
+                <button type="button" onclick="abrirLegal('termos')" class="hover:text-white transition-colors">Termos de Uso</button>
+                <button type="button" onclick="abrirLegal('reembolso')" class="hover:text-white transition-colors">Política de Reembolso</button>
+                <a href="https://www.instagram.com/setup_vipbr/" target="_blank" rel="noopener" class="hover:text-white transition-colors">Instagram @Setup_Vipbr</a>
+            </nav>
+            <div class="text-xs text-gray-600 border-t border-gray-800 pt-6">
+                © 2026 Setup VIP BR. Todos os direitos reservados. Pagamentos processados com segurança pelo Mercado Pago.
+            </div>
+        </div>
+    </footer>
+
+    <!-- BOTÃO FLUTUANTE DO TEMA (ESQUERDA) -->
+    <button type="button" onclick="alternarTema()" aria-label="Alternar Tema Claro/Escuro" class="fixed bottom-5 left-5 z-40 bg-gray-800 text-yellow-400 hover:bg-gray-700 rounded-full p-4 shadow-2xl transition-transform hover:scale-110 flex items-center justify-center border border-gray-600" id="btn-tema">
+        <svg id="icone-tema" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+    </button>
+
+    <!-- BOTÃO FLUTUANTE DO INSTAGRAM (DIREITA) -->
+    <a data-instagram href="#" target="_blank" rel="noopener" aria-label="Falar no Instagram" class="fixed bottom-5 right-5 z-40 text-white rounded-full p-4 shadow-2xl transition-transform hover:scale-110" style="background: linear-gradient(45deg, #f09433, #dc2743 55%, #bc1888);">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg>
+    </a>
+
+    <!-- AVISOS (TOAST) -->
+    <div id="toast-area" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 items-center pointer-events-none px-4"></div>
+
+    <!-- MODAL DO CHECKOUT -->
+    <div id="modal-checkout" role="dialog" aria-modal="true" aria-labelledby="titulo-checkout" class="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm flex items-center justify-center hidden z-50 px-4 transition-all">
+        <div class="bg-white rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+            <button type="button" onclick="fecharModal()" aria-label="Fechar" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h3 id="titulo-checkout" class="text-2xl font-black text-gray-900 mb-1">Finalizar Compra</h3>
+            <p id="modal-nome-produto" class="text-gray-500 mb-6 font-medium"></p>
+
+            <div class="mb-5">
+                <label for="quantidade" class="block text-sm font-bold text-gray-700 mb-2">Quantidade <span class="text-xs font-normal text-blue-600 bg-blue-50 px-2 py-0.5 rounded">(A partir de 5 = Desconto)</span></label>
+                <input type="number" id="quantidade" min="1" max="50" value="1" inputmode="numeric" oninput="atualizarPreco()" onchange="atualizarPreco(true)" class="w-full border-gray-300 border-2 rounded-xl px-4 py-3 text-lg focus:ring-blue-500 focus:border-blue-500 font-bold text-gray-900 text-center transition-colors disabled:bg-gray-100 disabled:text-gray-500">
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl mb-6 text-center border-2 border-gray-100">
+                <span class="block text-sm text-gray-500 mb-1 font-semibold uppercase tracking-wider">Total a pagar</span>
+                <span id="preco-total" class="text-4xl font-black text-green-600 tracking-tight">R$ 0,00</span>
+                <p id="aviso-desconto" class="text-sm text-green-700 bg-green-100 py-1.5 px-3 rounded-lg font-bold mt-3 hidden inline-block"></p>
+            </div>
+
+            <div id="area-botoes-iniciais">
+                <button type="button" id="btn-gerar-pix" onclick="gerarPix()" class="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black py-4 rounded-xl text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                    Gerar Pix Copia e Cola
+                </button>
+                <p class="text-xs text-gray-400 text-center mt-3">O valor final é confirmado no momento em que o Pix é gerado.</p>
+            </div>
+
+            <div id="area-pagamento-qrcode" class="hidden mt-6 text-center border-t-2 border-gray-100 pt-6">
+                <div class="bg-blue-50 text-blue-700 font-bold py-2 px-4 rounded-lg mb-6 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Aguardando Pagamento...
+                </div>
+                <img id="qr-code-img" src="" alt="QR Code Pix" class="mx-auto w-56 h-56 border-2 border-gray-200 rounded-xl p-3 mb-6 bg-white shadow-sm">
+                <h4 class="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Ou use a chave Copia e Cola</h4>
+                <div class="flex shadow-sm rounded-xl overflow-hidden border-2 border-gray-200 mb-2">
+                    <input type="text" id="input-copia-cola" readonly class="w-full px-4 py-3 text-xs bg-gray-50 text-gray-600 font-mono focus:outline-none">
+                    <button type="button" onclick="copiarPix()" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 font-bold text-sm transition-colors">Copiar</button>
+                </div>
+                <p class="text-xs text-gray-500 font-medium">Não feche esta janela. O redirecionamento será automático.</p>
+                <p class="text-xs text-gray-400 mt-1">Este Pix vale por 15 minutos.</p>
+            </div>
+
+            <div id="area-pagamento-sucesso" class="hidden mt-6 text-center border-t-2 border-gray-100 pt-6">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-green-600 mb-2">Pagamento Aprovado!</h3>
+                <p id="texto-sucesso" class="text-gray-600 mb-6 font-medium">Redirecionando para o WhatsApp em instantes...</p>
+                <a id="link-whatsapp-final" href="#" target="_blank" rel="noopener" class="w-full bg-green-500 hover:bg-green-600 text-white font-black py-4 rounded-xl text-lg shadow-lg flex items-center justify-center gap-2">
+                    Liberar Acesso Agora
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TERMOS E REEMBOLSO -->
+    <div id="modal-legal" role="dialog" aria-modal="true" class="fixed inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm flex items-center justify-center hidden z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl p-8 relative shadow-2xl max-h-[88vh] overflow-y-auto">
+            <button type="button" onclick="fecharLegal()" aria-label="Fechar" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div id="legal-termos" class="hidden text-sm text-gray-600 space-y-3">
+                <h3 class="text-2xl font-black text-gray-900 mb-2">Termos de Uso</h3>
+                <p><strong class="text-gray-900">O que vendemos.</strong> Licenças e acessos digitais a ferramentas de terceiros (IA, design, produtividade, entre outras). Os nomes e marcas citados pertencem aos seus respectivos proprietários. A Setup VIP BR é uma loja independente e não tem vínculo oficial com essas empresas.</p>
+                <p><strong class="text-gray-900">Pagamento.</strong> O pagamento é feito por Pix e processado pelo Mercado Pago. O valor final é confirmado no momento em que o Pix é gerado.</p>
+                <p><strong class="text-gray-900">Entrega.</strong> Depois da aprovação do Pix, você é direcionado ao nosso WhatsApp, onde conferimos o pedido e liberamos o acesso, normalmente em poucos minutos.</p>
+                <p><strong class="text-gray-900">Uso do produto.</strong> O uso das ferramentas deve respeitar os termos de cada plataforma. Compartilhar ou revender o acesso por conta própria pode causar bloqueios que fogem do nosso controle.</p>
+                <p><strong class="text-gray-900">Suporte.</strong> Atendimento pelo WhatsApp. Informe sempre o código do seu pedido.</p>
+            </div>
+
+            <div id="legal-reembolso" class="hidden text-sm text-gray-600 space-y-3">
+                <h3 class="text-2xl font-black text-gray-900 mb-2">Política de Reembolso</h3>
+                <p><strong class="text-gray-900">Problemas com o acesso.</strong> Se o acesso não funcionar como combinado, fale com a gente no WhatsApp. Primeiro tentamos resolver ou trocar o produto.</p>
+                <p><strong class="text-gray-900">Reembolso.</strong> Quando não for possível entregar ou corrigir o acesso, o valor pago é devolvido pelo mesmo meio de pagamento, via Mercado Pago.</p>
+                <p><strong class="text-gray-900">Como pedir.</strong> Chame no WhatsApp informando o código do pedido e o que aconteceu.</p>
+                <p><strong class="text-gray-900">Seus direitos.</strong> Esta política não substitui os direitos que você tem pelo Código de Defesa do Consumidor.</p>
+            </div>
+
+            <a data-instagram href="#" target="_blank" rel="noopener" class="mt-6 inline-flex bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg transition-colors">Falar no Instagram</a>
+        </div>
+    </div>
+
+    <!-- Fundo animado -->
+    <aside class="sv-bg" aria-hidden="true">
+        <span class="sv-blob b1"></span><span class="sv-blob b2"></span><span class="sv-blob b3"></span>
+        <span class="sv-vip">VIP</span>
+        <i class="sv-dot" style="left:2.3%;--s:4px;--d:28s;--l:-20s;--x:-54px;--c:0,183,255"></i>
+        <i class="sv-dot" style="left:7.3%;--s:3px;--d:27s;--l:-18s;--x:-53px;--c:122,60,255"></i>
+        <i class="sv-dot" style="left:16.6%;--s:4px;--d:17s;--l:-2s;--x:-5px;--c:255,63,174"></i>
+        <i class="sv-dot" style="left:20.7%;--s:4px;--d:18s;--l:-17s;--x:-6px;--c:0,183,255"></i>
+        <i class="sv-dot" style="left:25.2%;--s:3px;--d:23s;--l:-20s;--x:20px;--c:122,60,255"></i>
+        <i class="sv-dot" style="left:33.3%;--s:3px;--d:28s;--l:-1s;--x:-32px;--c:255,63,174"></i>
+        <i class="sv-dot" style="left:37.2%;--s:4px;--d:25s;--l:-13s;--x:-42px;--c:0,183,255"></i>
+        <i class="sv-dot" style="left:45.2%;--s:5px;--d:21s;--l:-3s;--x:14px;--c:122,60,255"></i>
+        <i class="sv-dot" style="left:51.3%;--s:4px;--d:27s;--l:-3s;--x:10px;--c:255,63,174"></i>
+        <i class="sv-dot" style="left:57.8%;--s:3px;--d:22s;--l:-15s;--x:27px;--c:0,183,255"></i>
+        <i class="sv-dot" style="left:63.1%;--s:5px;--d:30s;--l:-18s;--x:58px;--c:122,60,255"></i>
+        <i class="sv-dot" style="left:68.8%;--s:5px;--d:23s;--l:-5s;--x:29px;--c:255,63,174"></i>
+        <i class="sv-dot" style="left:76.1%;--s:3px;--d:25s;--l:-16s;--x:3px;--c:0,183,255"></i>
+        <i class="sv-dot" style="left:82.5%;--s:6px;--d:25s;--l:-19s;--x:-51px;--c:122,60,255"></i>
+        <i class="sv-dot" style="left:85.5%;--s:6px;--d:21s;--l:-10s;--x:-41px;--c:255,63,174"></i>
+        <i class="sv-dot" style="left:94.7%;--s:6px;--d:17s;--l:-2s;--x:37px;--c:0,183,255"></i>
+    </aside>
+
+    <script id="catalogo-inicial" type="application/json">[]</script>
+
+    <script>
+        // ====== CONFIGURAÇÃO ======
+        const CACHE_KEY = "setupvip_catalogo_v1";
+        const CACHE_MAX_IDADE_MS = 24 * 60 * 60 * 1000; // 24h
+        const PIX_TIMEOUT_MS = 15 * 60 * 1000;          // 15 min
+        const DESCONTO_REVENDA = 70.00 / 85.00;         // só exibição; o backend deve recalcular
+        const QTD_MINIMA_REVENDA = 5;
+
+        const CLASSE_CAT_ATIVA = "px-5 py-2.5 rounded-full text-sm font-black whitespace-nowrap transition-all border-2 bg-blue-600 text-white border-blue-600 shadow-md transform hover:scale-105";
+        const CLASSE_CAT_INATIVA = "px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2 bg-white text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600 shadow-sm";
+
+        // ====== ESTADO ======
+        let todosProdutos = [];
+        let categoriaAtiva = 'Todos';
+        let produtoSelecionado = null;
+        let precoBaseAtual = 0;
+        let precoComDesconto = 0;
+        let pedidoAtual = null;
+        let intervaloPagamento = null;
+        let timerBusca = null;
+
+        // ====== UTILIDADES ======
+        function esc(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function formatarMoeda(valor) {
+            return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function toast(mensagem, tipo = 'ok') {
+            const area = document.getElementById('toast-area');
+            const el = document.createElement('div');
+            el.className = 'pointer-events-auto px-4 py-3 rounded-xl text-sm font-bold shadow-xl text-white transition-all duration-300 opacity-0 translate-y-2 ' + (tipo === 'erro' ? 'bg-red-600' : 'bg-gray-900');
+            el.textContent = mensagem;
+            area.appendChild(el);
+            requestAnimationFrame(() => el.classList.remove('opacity-0', 'translate-y-2'));
+            setTimeout(() => {
+                el.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => el.remove(), 300);
+            }, 3500);
+        }
+
+        function configurarLinksContato() {
+            document.querySelectorAll('[data-instagram]').forEach(a => { a.href = INSTAGRAM_URL; });
+        }
+
+        // ====== TEMA CLARO/ESCURO ======
+        function alternarTema() {
+            const styleNeon = document.getElementById('setupvip-neon-theme');
+            const styleExtras = document.getElementById('setupvip-neon-extras');
+            const iconeTema = document.getElementById('icone-tema');
+            const btnTema = document.getElementById('btn-tema');
+
+            if (styleNeon.disabled) {
+                // Ativar tema Escuro (Neon)
+                styleNeon.disabled = false;
+                styleExtras.disabled = false;
+                document.documentElement.classList.remove('tema-claro');
+                localStorage.setItem('tema-setupvip', 'escuro');
+                // Ícone Sol
+                iconeTema.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+                btnTema.classList.remove('bg-white', 'text-gray-900');
+                btnTema.classList.add('bg-gray-800', 'text-yellow-400');
+            } else {
+                // Ativar tema Claro (Branco/Tailwind base)
+                styleNeon.disabled = true;
+                styleExtras.disabled = true;
+                document.documentElement.classList.add('tema-claro');
+                localStorage.setItem('tema-setupvip', 'claro');
+                // Ícone Lua
+                iconeTema.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+                btnTema.classList.remove('bg-gray-800', 'text-yellow-400');
+                btnTema.classList.add('bg-white', 'text-gray-900');
+            }
+        }
+        
+        // Ajusta o ícone inicial caso o utilizador tenha o tema claro guardado
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('tema-setupvip') === 'claro') {
+                document.getElementById('icone-tema').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+                const btnTema = document.getElementById('btn-tema');
+                btnTema.classList.remove('bg-gray-800', 'text-yellow-400');
+                btnTema.classList.add('bg-white', 'text-gray-900');
+            }
+        });
+
+        // ====== CACHE DO CATÁLOGO ======
+        function lerCache() {
+            try {
+                const bruto = localStorage.getItem(CACHE_KEY);
+                if (!bruto) return null;
+                const { quando, produtos } = JSON.parse(bruto);
+                if (!Array.isArray(produtos) || !produtos.length) return null;
+                if (Date.now() - quando > CACHE_MAX_IDADE_MS) return null;
+                return produtos;
+            } catch (e) { return null; }
+        }
+
+        function salvarCache(produtos) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ quando: Date.now(), produtos }));
+            } catch (e) { /* armazenamento indisponível: segue sem cache */ }
+        }
+
+        // ====== CATÁLOGO ======
+        function mostrarSkeleton() {
+            const vitrine = document.getElementById('vitrine');
+            vitrine.innerHTML = Array.from({ length: 8 }, () => `
+                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm animate-pulse">
+                    <div class="h-4 w-24 bg-gray-200 rounded mb-6"></div>
+                    <div class="flex items-center gap-4 mb-5">
+                        <div class="w-14 h-14 bg-gray-200 rounded-xl"></div>
+                        <div class="flex-1 space-y-2"><div class="h-3 w-16 bg-gray-200 rounded"></div><div class="h-5 w-32 bg-gray-200 rounded"></div></div>
+                    </div>
+                    <div class="space-y-2 mb-6"><div class="h-3 bg-gray-200 rounded"></div><div class="h-3 w-4/5 bg-gray-200 rounded"></div></div>
+                    <div class="flex justify-between items-end pt-4 border-t border-gray-100"><div class="h-8 w-24 bg-gray-200 rounded"></div><div class="h-10 w-24 bg-gray-200 rounded-lg"></div></div>
+                </div>`).join('');
+        }
+
+        let modoPreview = false;
+
+        function lerSnapshot() {
+            try {
+                const arr = JSON.parse(document.getElementById('catalogo-inicial').textContent);
+                return Array.isArray(arr) && arr.length ? arr : null;
+            } catch (e) { return null; }
+        }
+
+        function definirPreview(ativo, mensagem) {
+            modoPreview = ativo;
+            const aviso = document.getElementById('aviso-preview');
+            aviso.onclick = null;
+            aviso.classList.remove('cursor-pointer');
+            if (ativo) {
+                aviso.textContent = mensagem || '⏳ Atualizando preços e estoque…';
+                aviso.classList.remove('hidden');
+            } else {
+                aviso.classList.add('hidden');
+            }
+        }
+
+        async function carregarCatalogo() {
+            const previa = lerCache() || lerSnapshot();
+            if (previa) {
+                definirPreview(true);
+                aplicarCatalogo(previa);
+            } else {
+                mostrarSkeleton();
+                setTimeout(() => { if (!todosProdutos.length) toast('Acordando o servidor… a 1ª visita pode levar até 1 minuto.'); }, 8000);
+            }
+
+            const controlador = new AbortController();
+            const limite = setTimeout(() => controlador.abort(), 90000);
+            try {
+                let produtos = null;
+                if (window.__catalogoPromise) { produtos = await window.__catalogoPromise; window.__catalogoPromise = null; }
+                if (!produtos) {
+                    const response = await fetch(`${API_BASE_URL}/api/catalogo`, { signal: controlador.signal });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    produtos = await response.json();
+                }
+                if (!Array.isArray(produtos)) throw new Error('Resposta inesperada');
+                definirPreview(false);
+                salvarCache(produtos);
+                aplicarCatalogo(produtos);
+            } catch (error) {
+                console.error('Erro ao carregar:', error);
+                if (previa) {
+                    definirPreview(true, 'Não conseguimos atualizar agora. Toque aqui para tentar de novo.');
+                    const aviso = document.getElementById('aviso-preview');
+                    aviso.classList.add('cursor-pointer');
+                    aviso.onclick = () => carregarCatalogo();
+                } else {
+                    document.getElementById('vitrine').innerHTML = `
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-red-500 font-bold mb-4">Não conseguimos carregar o catálogo agora.</p>
+                            <button type="button" onclick="carregarCatalogo()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg">Tentar novamente</button>
+                        </div>`;
+                }
+            } finally {
+                clearTimeout(limite);
+            }
+        }
+
+        function aplicarCatalogo(produtosRecebidos) {
+            const produtos = produtosRecebidos.map(p => ({ ...p, destaque: false }));
+            const idx = produtos.findIndex(p => /gemini|google pro/i.test(p.nome || ''));
+            if (idx > -1) {
+                const destaque = produtos.splice(idx, 1)[0];
+                destaque.destaque = true;
+                produtos.unshift(destaque);
+            }
+            todosProdutos = produtos;
+
+            if (!produtos.length) {
+                document.getElementById('vitrine').innerHTML = '<p class="text-center text-gray-500 col-span-full font-bold">Nenhum produto disponível no momento.</p>';
+                return;
+            }
+
+            atualizarContadorCatalogo(produtos);
+            gerarFiltrosDeCategoria(produtos);
+            filtrarEAtualizar();
+        }
+
+        // ====== CONTADORES ======
+        function animarNumero(el, alvo, duracao = 900) {
+            const de = parseInt(el.innerText, 10) || 0;
+            if (de === alvo) { el.innerText = alvo; return; }
+            const inicio = performance.now();
+            function passo(agora) {
+                const t = Math.min((agora - inicio) / duracao, 1);
+                const suave = 1 - Math.pow(1 - t, 3);
+                el.innerText = Math.round(de + (alvo - de) * suave);
+                if (t < 1) requestAnimationFrame(passo);
+            }
+            requestAnimationFrame(passo);
+        }
+
+        function atualizarContadorCatalogo(produtos) {
+            const totalCategorias = new Set(produtos.map(p => p.categoria || 'Licença Premium')).size;
+            
+            document.getElementById('contador-catalogo').classList.remove('opacity-0', 'translate-y-1');
+            document.getElementById('contador-licencas').classList.remove('opacity-0', 'translate-y-1');
+            
+            animarNumero(document.getElementById('contador-produtos'), produtos.length);
+            animarNumero(document.getElementById('contador-categorias'), totalCategorias);
+            
+            animarNumero(document.getElementById('contador-vendas'), licencasAtivadas, 1200);
+        }
+
+        // ====== FILTROS ======
+        function gerarFiltrosDeCategoria(produtos) {
+            const categorias = ['Todos', ...new Set(produtos.map(p => p.categoria || 'Licença Premium'))];
+            if (!categorias.includes(categoriaAtiva)) categoriaAtiva = 'Todos';
+
+            const container = document.getElementById('filtros-categoria');
+            container.innerHTML = '';
+            categorias.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.innerText = cat;
+                btn.className = cat === categoriaAtiva ? CLASSE_CAT_ATIVA : CLASSE_CAT_INATIVA;
+                btn.dataset.ativo = cat === categoriaAtiva ? 'true' : 'false';
+                btn.onclick = () => {
+                    categoriaAtiva = cat;
+                    Array.from(container.children).forEach(b => { const ativo = b.innerText === cat; b.className = ativo ? CLASSE_CAT_ATIVA : CLASSE_CAT_INATIVA; b.dataset.ativo = ativo ? 'true' : 'false'; });
+                    filtrarEAtualizar();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function buscaComDelay() {
+            clearTimeout(timerBusca);
+            timerBusca = setTimeout(filtrarEAtualizar, 200);
+        }
+
+        function filtrarEAtualizar() {
+            const campo = document.getElementById('input-busca');
+            const termo = campo.value.trim().toLowerCase();
+
+            const filtrados = todosProdutos.filter(p => {
+                const cat = p.categoria || 'Licença Premium';
+                const okCategoria = categoriaAtiva === 'Todos' || cat === categoriaAtiva;
+                const okBusca = (p.nome || '').toLowerCase().includes(termo) || (p.descricao || '').toLowerCase().includes(termo);
+                return okCategoria && okBusca;
+            });
+
+            renderizarProdutos(filtrados);
+
+            const titulo = document.getElementById('titulo-vitrine');
+            if (termo !== '') titulo.innerText = `Resultados para "${campo.value.trim()}"`;
+            else titulo.innerText = categoriaAtiva === 'Todos' ? 'Produtos em Destaque' : categoriaAtiva;
+        }
+
+        // ====== VITRINE ======
+        function renderizarProdutos(lista) {
+            const vitrine = document.getElementById('vitrine');
+            vitrine.innerHTML = '';
+
+            if (lista.length === 0) {
+                vitrine.innerHTML = '<p class="text-center text-gray-500 col-span-full font-bold py-10">Nenhum produto encontrado. Tente buscar por outro termo.</p>';
+                return;
+            }
+
+            lista.forEach(p => {
+                const nomeSeguro = esc(p.nome);
+                const categoria = esc(p.categoria || 'Licença Premium');
+                const tagDestaque = p.destaque ? `
+                    <div class="absolute -top-3 -right-3 bg-amber-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg z-10">⭐ DESTAQUE</div>` : '';
+
+                const card = document.createElement('div');
+                card.className = 'relative bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-xl transition-all flex flex-col justify-between transform hover:-translate-y-1';
+                
+                // A REGRA 'md:line-clamp-none' FOI ADICIONADA ABAIXO NO h3 E NO p
+                card.innerHTML = `
+                    ${tagDestaque}
+                    <div>
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                            <span class="inline-flex items-center gap-1 whitespace-nowrap shrink-0 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                                <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                100% Oficial
+                            </span>
+                            <span class="whitespace-nowrap text-[11px] font-bold text-gray-400">Liberação via WhatsApp</span>
+                        </div>
+
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="logo-box w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 shadow-sm flex items-center justify-center flex-shrink-0 p-2 overflow-hidden"></div>
+                            <div>
+                                <span class="inline-block text-[10px] font-black uppercase tracking-wider text-blue-600 bg-blue-100 px-2 py-0.5 rounded mb-1">${categoria}</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-tight line-clamp-2 md:line-clamp-none">${nomeSeguro}</h3>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-500 text-sm mb-4 line-clamp-3 md:line-clamp-none">${esc(p.descricao)}</p>
+                    </div>
+                    <div class="flex flex-wrap justify-between items-end gap-3 mt-4 pt-4 border-t border-gray-100">
+                        <span class="preco-card text-3xl font-extrabold text-gray-900 tracking-tight whitespace-nowrap">${formatarMoeda(p.precoBase)}</span>
+                        <button type="button" class="btn-comprar grow min-w-[7.5rem] whitespace-nowrap text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg transition-colors shadow-md hover:shadow-lg">Comprar</button>
+                    </div>
+                `;
+
+                // Logo com fallback
+                const img = document.createElement('img');
+                img.alt = '';
+                img.loading = 'lazy';
+                img.className = 'w-full h-full object-contain rounded-md';
+                const nomeLimpo = String(p.nome || '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                const urlFallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeLimpo)}&background=eff6ff&color=2563eb&rounded=lg&bold=true&size=128`;
+                img.onerror = () => { img.onerror = null; img.src = urlFallback; };
+                img.src = `https://icon.horse/icon/${encodeURIComponent(p.logoDomain || '')}`;
+                card.querySelector('.logo-box').appendChild(img);
+
+                const btnComprar = card.querySelector('.btn-comprar');
+                btnComprar.addEventListener('click', () => abrirCheckout(p));
+                if (modoPreview) {
+                    btnComprar.disabled = true;
+                    btnComprar.textContent = 'Atualizando…';
+                    btnComprar.classList.add('opacity-60', 'cursor-not-allowed');
+                }
+                vitrine.appendChild(card);
+            });
+        }
+
+        // ====== CHECKOUT ======
+        function abrirCheckout(produto) {
+            produtoSelecionado = { id: produto.id, nome: produto.nome };
+            precoBaseAtual = Number(produto.precoBase) || 0;
+            precoComDesconto = precoBaseAtual * DESCONTO_REVENDA;
+            pedidoAtual = null;
+
+            document.getElementById('modal-nome-produto').innerText = produto.nome;
+            const qtd = document.getElementById('quantidade');
+            qtd.value = 1;
+            qtd.disabled = false;
+            atualizarPreco();
+
+            document.getElementById('area-botoes-iniciais').classList.remove('hidden');
+            document.getElementById('area-pagamento-qrcode').classList.add('hidden');
+            document.getElementById('area-pagamento-sucesso').classList.add('hidden');
+
+            document.getElementById('modal-checkout').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-checkout').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            pararRadar();
+        }
+
+        function lerQuantidade(corrigir = false) {
+            const campo = document.getElementById('quantidade');
+            let qtd = parseInt(campo.value, 10);
+            if (isNaN(qtd) || qtd < 1) qtd = 1;
+            if (qtd > 50) qtd = 50;
+            if (corrigir) campo.value = qtd;
+            return qtd;
+        }
+
+        function atualizarPreco(corrigir = false) {
+            const qtd = lerQuantidade(corrigir);
+            const precoUnitario = qtd >= QTD_MINIMA_REVENDA ? precoComDesconto : precoBaseAtual;
+            document.getElementById('preco-total').innerText = formatarMoeda(precoUnitario * qtd);
+
+            const aviso = document.getElementById('aviso-desconto');
+            if (qtd >= QTD_MINIMA_REVENDA) {
+                aviso.innerText = `🎉 Preço de revenda desbloqueado! (${formatarMoeda(precoComDesconto)} cada)`;
+                aviso.classList.remove('hidden');
+            } else {
+                aviso.classList.add('hidden');
+            }
+        }
+
+        async function gerarPix() {
+            const qtd = lerQuantidade(true);
+            const btn = document.getElementById('btn-gerar-pix');
+            btn.innerText = 'Processando Pix...';
+            btn.disabled = true;
+
+            try {
+                const clienteId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'site_' + Math.random().toString(36).substring(2, 12);
+                const response = await fetch(`${API_BASE_URL}/gerar-pix`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        client_id: clienteId,
+                        produto_id: produtoSelecionado.id,
+                        quantidade: qtd
+                    })
+                });
+
+                const dados = await response.json();
+
+                if (!response.ok || dados.error) {
+                    toast('Erro ao gerar Pix: ' + (dados.error || 'tente novamente'), 'erro');
+                } else {
+                    pedidoAtual = { nome: produtoSelecionado.nome, qtd, clienteId };
+                    document.getElementById('quantidade').disabled = true;
+                    mostrarTelaPix(dados.qr_code_base64, dados.copia_e_cola);
+                    iniciarRadarPagamento(dados.id_pagamento_mp);
+                }
+            } catch (error) {
+                toast('Erro de conexão ao tentar gerar o Pix.', 'erro');
+            } finally {
+                btn.innerText = 'Gerar Pix Copia e Cola';
+                btn.disabled = false;
+            }
+        }
+
+        function mostrarTelaPix(qrBase64, copiaCola) {
+            document.getElementById('area-botoes-iniciais').classList.add('hidden');
+            document.getElementById('area-pagamento-qrcode').classList.remove('hidden');
+            document.getElementById('qr-code-img').src = `data:image/jpeg;base64,${qrBase64}`;
+            document.getElementById('input-copia-cola').value = copiaCola;
+        }
+
+        async function copiarPix() {
+            const input = document.getElementById('input-copia-cola');
+            try {
+                await navigator.clipboard.writeText(input.value);
+                toast('✅ Código Pix copiado!');
+            } catch (e) {
+                input.select();
+                try {
+                    document.execCommand('copy');
+                    toast('✅ Código Pix copiado!');
+                } catch (e2) {
+                    toast('Não foi possível copiar. Selecione e copie manualmente.', 'erro');
+                }
+            }
+        }
+
+        // ====== RADAR DO PAGAMENTO ======
+        function pararRadar() {
+            if (intervaloPagamento) clearInterval(intervaloPagamento);
+            intervaloPagamento = null;
+        }
+
+        function pixExpirado() {
+            toast('O Pix expirou. Gere um novo para continuar.', 'erro');
+            document.getElementById('area-pagamento-qrcode').classList.add('hidden');
+            document.getElementById('area-botoes-iniciais').classList.remove('hidden');
+            document.getElementById('quantidade').disabled = false;
+        }
+
+        function iniciarRadarPagamento(idPagamento) {
+            pararRadar();
+            const inicio = Date.now();
+            let consultando = false;
+
+            intervaloPagamento = setInterval(async () => {
+                if (Date.now() - inicio > PIX_TIMEOUT_MS) {
+                    pararRadar();
+                    pixExpirado();
+                    return;
+                }
+                if (consultando) return;
+                consultando = true;
+                try {
+                    const response = await fetch(`${API_BASE_URL}/status/${encodeURIComponent(idPagamento)}?cid=${encodeURIComponent(pedidoAtual ? pedidoAtual.clienteId : '')}`);
+                    if (response.ok) {
+                        const dadosStatus = await response.json();
+                        if (dadosStatus.status === 'approved') {
+                            pararRadar();
+                            mostrarTelaSucesso(dadosStatus.codigo_pedido, dadosStatus.whatsapp);
+                        }
+                    }
+                } catch (error) {
+                    console.log('Verificando status...');
+                } finally {
+                    consultando = false;
+                }
+            }, 5000);
+        }
+
+        function mostrarTelaSucesso(codigoPedido, whatsapp) {
+            document.getElementById('area-pagamento-qrcode').classList.add('hidden');
+            document.getElementById('area-pagamento-sucesso').classList.remove('hidden');
+
+            const qtd = pedidoAtual ? pedidoAtual.qtd : lerQuantidade();
+            const nome = pedidoAtual ? pedidoAtual.nome : (produtoSelecionado ? produtoSelecionado.nome : 'produto');
+            const codigo = codigoPedido || 'PIX-APROVADO';
+            const botao = document.getElementById('link-whatsapp-final');
+            const texto = document.getElementById('texto-sucesso');
+
+            const numero = String(whatsapp || '').replace(/\D/g, '');
+            if (numero) {
+                const msg = encodeURIComponent(`Fala Felipe! Acabei de fazer o pagamento de ${qtd}x ${nome} no site. Meu código de pedido é ${codigo}. Pode conferir e liberar meu acesso?`);
+                const linkWhats = `https://wa.me/${numero}?text=${msg}`;
+                botao.href = linkWhats;
+                setTimeout(() => { window.location.href = linkWhats; }, 3000);
+            } else {
+                texto.innerText = `Seu código de pedido é ${codigo}. Anote e fale com a gente no Instagram para receber o acesso.`;
+                botao.href = INSTAGRAM_URL;
+                botao.innerText = 'Falar no Instagram';
+            }
+        }
+
+        // ====== TERMOS / REEMBOLSO ======
+        function abrirLegal(qual) {
+            document.getElementById('legal-termos').classList.toggle('hidden', qual !== 'termos');
+            document.getElementById('legal-reembolso').classList.toggle('hidden', qual !== 'reembolso');
+            document.getElementById('modal-legal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function fecharLegal() {
+            document.getElementById('modal-legal').classList.add('hidden');
+            if (document.getElementById('modal-checkout').classList.contains('hidden')) {
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // ====== FECHAR COM ESC / CLIQUE FORA ======
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            if (!document.getElementById('modal-legal').classList.contains('hidden')) fecharLegal();
+            else if (!document.getElementById('modal-checkout').classList.contains('hidden')) fecharModal();
+        });
+        document.getElementById('modal-checkout').addEventListener('click', e => {
+            if (e.target.id === 'modal-checkout') fecharModal();
+        });
+        document.getElementById('modal-legal').addEventListener('click', e => {
+            if (e.target.id === 'modal-legal') fecharLegal();
+        });
+
+        // ====== DEPOIMENTOS ======
+        const INSTAGRAM_URL = "https://www.instagram.com/setup_vipbr/";
+        const DEPOIMENTOS = [
+            { nome: "Rafael Costa", iniciais: "RC", cor: "bg-blue-600", verificado: true, texto: "Comprei o ChatGPT Plus e recebi o acesso no WhatsApp em menos de 2 minutos. Atendimento impecável!" },
+            { nome: "Mariana Souza", iniciais: "MS", cor: "bg-gray-800", verificado: true, texto: "Melhor preço que encontrei para o Canva Pro. O suporte me ajudou a configurar rapidinho. Recomendo demais!" },
+            { nome: "Gabriel Lima", iniciais: "GL", cor: "bg-blue-800", verificado: true, texto: "Já é a terceira ferramenta que compro aqui. Sistema automatizado perfeito e zero dor de cabeça." },
+            { nome: "Cliente do Instagram", iniciais: "IG", cor: "bg-gray-700", origem: "Atendimento pelo Instagram", citacao: false, texto: "Estava com problema de falta de espaço, chamou a Setup VIP pelo Instagram e o problema foi solucionado." }
+        ];
+
+        function renderizarDepoimentos() {
+            const grade = document.getElementById('grid-depoimentos');
+            grade.innerHTML = DEPOIMENTOS.map(d => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-amber-400 mb-3" aria-label="5 estrelas">★★★★★</div>
+                        <p class="text-gray-600 text-sm mb-4 ${d.citacao === false ? '' : 'italic'}">${d.citacao === false ? esc(d.texto) : '"' + esc(d.texto) + '"'}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 ${d.cor} text-white rounded-full flex items-center font-bold justify-center text-sm">${esc(d.iniciais)}</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">${esc(d.nome)}</h4>
+                            <span class="text-xs text-green-600 font-semibold">${d.verificado ? '✓ Compra Verificada' : '✓ ' + esc(d.origem || '')}</span>
+                        </div>
+                    </div>
+                </div>`).join('');
+
+            if (INSTAGRAM_URL) {
+                grade.insertAdjacentHTML('afterend', `<div class="text-center mt-8"><a href="${esc(INSTAGRAM_URL)}" target="_blank" rel="noopener" class="inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Ver mais no Instagram</a></div>`);
+            }
+        }
+
+        // ====== LICENÇAS ATIVADAS (número real, definido no servidor) ======
+        const LICENCAS_PADRAO = 127; // só aparece se o servidor não responder e não houver valor guardado
+        let licencasAtivadas = LICENCAS_PADRAO;
+        try { licencasAtivadas = Number(localStorage.getItem('setupvip_licencas')) || LICENCAS_PADRAO; } catch (e) {}
+
+        async function carregarStats() {
+            try {
+                const r = await fetch(`${API_BASE_URL}/api/stats`);
+                if (!r.ok) return;
+                const n = parseInt((await r.json()).licencas, 10);
+                if (!(n > 0)) return;
+                licencasAtivadas = n;
+                try { localStorage.setItem('setupvip_licencas', String(n)); } catch (e) {}
+                animarNumero(document.getElementById('contador-vendas'), n, 1200);
+            } catch (e) { /* mantém o valor atual */ }
+        }
+
+        // ====== INÍCIO ======
+        configurarLinksContato();
+        renderizarDepoimentos();
+        carregarCatalogo();
+        carregarStats();
+    </script>
+</body>
+</html>
